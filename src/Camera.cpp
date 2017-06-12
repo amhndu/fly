@@ -80,12 +80,18 @@ void Camera::updateView(float dt)
         m_position += sign * m_direction * velocity * dt;
         m_viewChanged = true;
     }
-
     negate = false;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || (negate = sf::Keyboard::isKeyPressed(sf::Keyboard::D)))
     {
         float sign = 1 - negate * 2;
         m_position += sign * glm::normalize(glm::cross(m_up, m_direction)) * velocity * dt;
+        m_viewChanged = true;
+    }
+    negate = false;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || (negate = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)))
+    {
+        float sign = 1 - negate * 2;
+        m_position += sign * m_up * velocity * dt;
         m_viewChanged = true;
     }
 

@@ -60,6 +60,7 @@ int main()
     const float frame_period_seconds = std::chrono::duration<float>(frame_period).count();
     sf::Event event;
     bool running = true;
+    bool focus = true;
     while (running)
     {
         while (window.pollEvent(event))
@@ -67,10 +68,17 @@ int main()
             if (event.type == sf::Event::Closed ||
                (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape))
                 running = false;
+            else if (event.type == sf::Event::GainedFocus)
+            {
+                focus = true;
+                prev_time = std::chrono::steady_clock::now();
+            }
+            else if (event.type == sf::Event::LostFocus)
+                focus = false;
         }
 
         auto now = std::chrono::steady_clock::now();
-        while (now - prev_time > frame_period)
+        while (focus && now - prev_time > frame_period)
         {
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

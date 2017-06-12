@@ -11,4 +11,4 @@ Dependencies:
 
 Should be available in your repos. Once, installed, run cmake on the project directory.
 
-(Try: WASD and mouse. Esc to quit)
+(Try: WASD, Space, Shift and moving the mouse. Esc to quit)
