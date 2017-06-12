@@ -44,20 +44,20 @@ int main()
 
     TextureManager::uploadFile("texture.png");
     ShaderProgram shader;
-    glm::vec3 start_pos = {0.1f, 1.2f, 0.1f};
     Camera camera(shader,
-                  start_pos,
-                  -start_pos,
+                  {-1.0f, 0.3f, -1.0f},
+                  glm::normalize(glm::vec3{0.8f, -0.1f, 0.6f}),
                   glm::vec3(0.0f, 1.0f, 0.0f),
-                  glm::perspective(glm::radians(45.0f), 1.f * window.getSize().x / window.getSize().y, 0.1f, 10.0f),
+                  glm::perspective(glm::radians(45.0f), 1.f * window.getSize().x / window.getSize().y, 0.05f, 10.0f),
                   window);
     Terrain terrain(shader);
-    terrain.generate(25);
+    terrain.generate(50);
 
     glEnable(GL_DEPTH_TEST);
 
-    auto prev_time = std::chrono::system_clock::now();
-    const std::chrono::milliseconds frame_period(1000/60);
+    auto prev_time = std::chrono::steady_clock::now();
+    const std::chrono::steady_clock::duration frame_period(std::chrono::milliseconds(1000/60));
+    const float frame_period_seconds = std::chrono::duration<float>(frame_period).count();
     sf::Event event;
     bool running = true;
     while (running)
@@ -69,13 +69,13 @@ int main()
                 running = false;
         }
 
-        auto now = std::chrono::system_clock::now();
+        auto now = std::chrono::steady_clock::now();
         while (now - prev_time > frame_period)
         {
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            camera.updateView(1.f/60.f);
+            camera.updateView(frame_period_seconds);
             terrain.draw();
 
             window.display();
