@@ -59,7 +59,7 @@ void Terrain::generate(int m)
     m_shader.setAttributeFloat("texcoords", 2, sizeof(Vertex), offsetof(Vertex, texcoords));
 
 
-    m_shader.setUniform("tex", TextureManager::getSampler("texture.png"));
+    m_shader.setUniform("tex", TextureManager::getSampler("resources/texture.png"));
     m_shader.setUniform("model", glm::mat4(1.f));
 
     glm::mat4 view = glm::lookAt(

@@ -26,8 +26,9 @@ file(GLOB SOURCES
 #     add_definitions(-DDEBUG)
 # endif()
 
-# Copy shaders
+# Copy shaders and resources
 file(COPY shaders DESTINATION .)
+file(COPY resources DESTINATION .)
 
 # Will add __FILENAME__ macros for all source files, which is the filename without full find_path
 # Courtesy of SO
