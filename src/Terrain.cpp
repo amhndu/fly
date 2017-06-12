@@ -11,6 +11,9 @@ namespace fly
 
 void Terrain::generate(int m)
 {
+    // `m' is the level of detail
+    // Texture isn't mapped to scale
+
     m_vertices.reserve((m + 1) * (m + 1));
     for (int i = 0; i <= m; ++i)
     {
