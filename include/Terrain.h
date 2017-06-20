@@ -2,8 +2,7 @@
 #define TERRAIN_H
 
 #include <vector>
-#include "Vertex.h"
-#include "Shader.h"
+#include "TerrainRenderer.h"
 
 
 namespace fly
@@ -13,19 +12,29 @@ namespace fly
 class Terrain
 {
 public:
-    Terrain(ShaderProgram& shader) : m_shader(shader), texture(0), vertexBuffer(0), ebo(0) {}
-    ~Terrain();
-    void generate(int m);
+    Terrain(ShaderProgram& shader, int radius, int detail) :
+            m_radius(radius), m_detail(detail), m_center(0.f, 0.f),
+            m_centerChunk{0, 0}, m_deltaChunkMap{0, 0},
+            m_renderer(shader, radius, detail) {}
+    void generate();
     void draw();
+    void moveCenter(const glm::vec2& displacement);
 private:
-    std::vector<Vertex> m_vertices;
-    ShaderProgram& m_shader;
+    void generateChunk(int coord_x, int coord_y, std::vector<float>& heights);
+    void updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& heights);
 
-    // TODO: Move these outside this class (also move shaderprogram) to something like a TextureRenderer or independent classes
-    GLuint texture;
-    GLuint vertexBuffer;
-    std::vector<GLuint> elements;
-    GLuint ebo;
+    struct Pair
+    {
+        int x, y;
+    };
+
+    int m_radius;
+    int m_detail;
+    glm::vec2 m_center;
+    Pair m_centerChunk;
+    Pair m_deltaChunkMap;
+    std::vector<std::vector<Pair>> m_chunkMap;
+    TerrainRenderer m_renderer;
 };
 
 }

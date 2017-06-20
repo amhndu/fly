@@ -20,6 +20,10 @@ class ShaderProgram
 public:
     ShaderProgram();
     ~ShaderProgram();
+
+    ShaderProgram(const ShaderProgram& other) = delete;
+    ShaderProgram& operator= (const ShaderProgram& other) = delete;
+
     bool loadShaderFile(const std::string& path, Shader type);
     void use();
 

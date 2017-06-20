@@ -1,18 +1,15 @@
 #include "Camera.h"
 #include "Log.h"
+#include "Utility.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include <SFML/Window/Mouse.hpp>
-#include <SFML/Window/Keyboard.hpp>
 #include <cmath>
 
 namespace fly
 {
 
 Camera::Camera(ShaderProgram& shader, glm::vec3 position, glm::vec3 direction, glm::vec3 up,
-               glm::mat4 defaultProj, sf::Window& window) :
+               glm::mat4 defaultProj) :
                     m_shader(shader),
-                    m_window(window),
-                    m_prevMouse(sf::Mouse::getPosition(window)),
                     m_position(position),
                     m_direction(direction),
                     m_up(up),
@@ -21,82 +18,14 @@ Camera::Camera(ShaderProgram& shader, glm::vec3 position, glm::vec3 direction, g
                     m_projChanged(true),
                     m_projection(defaultProj)
 {
-    m_prevMouse = static_cast<sf::Vector2i>(m_window.getSize()) / 2;
-    sf::Mouse::setPosition(m_prevMouse, window);
 }
 
-std::ostream& operator<< (std::ostream& out, const glm::vec3& vec)
+void Camera::updateView()
 {
-    out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")" << "; " << glm::length(vec);
-    return out;
-}
-
-void Camera::updateView(float dt)
-{
-    auto newMouse = sf::Mouse::getPosition(m_window);
-    if (newMouse != m_prevMouse)
-    {
-        auto diff = newMouse - m_prevMouse;
-        const float multiplier = M_PI / 6.f;
-        if (diff.y)
-        {
-            diff.y = -diff.y;
-            float theta = multiplier * diff.y / m_window.getSize().y;
-            auto prev_dir = m_direction, prev_up = m_up;
-            m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * prev_up);
-            // m_up        = glm::normalize(std::cos(theta) * prev_up  + std::sin(theta) * prev_dir);
-            m_viewChanged = true;
-        }
-        if (diff.x)
-        {
-            float theta = multiplier * diff.x / m_window.getSize().x;
-            auto prev_dir = m_direction;
-            auto cross  = glm::normalize(glm::cross(m_direction, m_up));
-            m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * cross);
-            // m_up        = glm::normalize(std::cos(theta) * prev_up  + std::sin(theta) * cross);
-            m_viewChanged = true;
-        }
-
-        if (m_viewChanged)
-        {
-            // LOG(Debug) << "Direction: " << m_direction << std::endl;
-            // LOG(Debug) << "Position: " << m_position<< std::endl;
-            if (std::abs(newMouse.x - (int)(m_window.getSize().x) / 2) >= (int)m_window.getSize().x / 4
-             || std::abs(newMouse.y - (int)(m_window.getSize().y) / 2) >= (int)m_window.getSize().y / 4)
-            {
-                m_prevMouse = static_cast<sf::Vector2i>(m_window.getSize()) / 2;
-                sf::Mouse::setPosition(m_prevMouse, m_window);
-            }
-            else
-                m_prevMouse = newMouse;
-        }
-    }
-
-    bool negate = false;
-    const float velocity = 0.5f;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || (negate = sf::Keyboard::isKeyPressed(sf::Keyboard::S)))
-    {
-        float sign = 1 - negate * 2;
-        m_position += sign * m_direction * velocity * dt;
-        m_viewChanged = true;
-    }
-    negate = false;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || (negate = sf::Keyboard::isKeyPressed(sf::Keyboard::D)))
-    {
-        float sign = 1 - negate * 2;
-        m_position += sign * glm::normalize(glm::cross(m_up, m_direction)) * velocity * dt;
-        m_viewChanged = true;
-    }
-    negate = false;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || (negate = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)))
-    {
-        float sign = 1 - negate * 2;
-        m_position += sign * m_up * velocity * dt;
-        m_viewChanged = true;
-    }
-
     if (m_viewChanged)
     {
+//          LOG(Debug) << "Direction: " << m_direction << std::endl;
+//          LOG(Debug) << "Position: " << m_position<< std::endl;
         m_view = glm::lookAt(m_position,
                              m_direction + m_position,
                              m_up);
@@ -108,6 +37,38 @@ void Camera::updateView(float dt)
         m_shader.setUniform("proj", m_projection);
         m_projChanged = false;
     }
+}
+
+glm::vec2 Camera::move(float dx, float dy, float dz)
+{
+    glm::vec3 delta (0.f, 0.f, 0.f);
+    // delta += glm::normalize(m_direction) * dx;
+    delta += glm::normalize(glm::vec3{m_direction.x, m_direction.y, 0.f}) * dx;
+    delta += glm::normalize(glm::cross(m_up, m_direction)) * (-dy);
+    delta += m_up * dz;
+    m_position += delta;
+    m_viewChanged = true;
+    return {delta.x, delta.y};
+}
+
+void Camera::rotate(float x, float y)
+{
+    const float multiplier = M_PI / 6.f;
+    if (y)
+    {
+        y = -y;
+        float theta = multiplier * y;
+        auto prev_dir = m_direction, prev_up = m_up;
+        m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * prev_up);
+    }
+    if (x)
+    {
+        float theta = multiplier * x;
+        auto prev_dir = m_direction;
+        auto cross  = glm::normalize(glm::cross(m_direction, m_up));
+        m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * cross);
+    }
+    m_viewChanged = true;
 }
 
 }

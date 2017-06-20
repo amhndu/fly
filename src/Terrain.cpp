@@ -2,87 +2,101 @@
 #include "simplexnoise.h"
 #include "Log.h"
 #include "Utility.h"
-#include "TextureManager.h"
-#include <SFML/Graphics/Image.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <cassert>
 
 namespace fly
 {
 
-void Terrain::generate(int m)
+// Modulo which only returns positive
+static int mod_pos(int a, int b)
 {
-    // `m' is the level of detail
-    // Texture isn't mapped to scale
+    return (a % b + b) % b;
+}
 
-    m_vertices.reserve((m + 1) * (m + 1));
-    for (int i = 0; i <= m; ++i)
+void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& heights)
+{
+    for (int i = 0, c = 0; i <= m_detail; ++i)
     {
-        for (int j = 0; j <= m; ++j)
+        for (int j = 0; j <= m_detail; ++j, ++c)
         {
-            float x = 2.0f * i / m - 1.f,
-                  y = 2.0f * j / m - 1.0f;
-            GLfloat height = scaled_octave_noise_3d(4.f, 0.4f, 1.f, 0.f, 0.4f, x, y, 5.14f);
-            m_vertices.push_back({{x, height, y},
-                                 {static_cast<float>(i % 2), 1 - static_cast<float>(j % 2)}});
+            float x = coord_x + 1.0f * i / m_detail - 0.5f,
+                  y = coord_y + 1.0f * j / m_detail - 0.5f;
+            float height = scaled_octave_noise_3d(4.f, 0.4f, 1.f, 0.f, 0.4f, x, y, 5.14f);
+            heights[c] = height;
         }
     }
+}
 
-    elements.reserve(m * m * 6);
-    for (int i = 0; i < m; ++i)
+void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& heights)
+{
+    m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1] = {coord_x, coord_y};
+    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, heights);
+}
+
+void Terrain::generate()
+{
+    m_renderer.reset(m_radius, m_detail);
+    m_chunkMap.resize(2 * m_radius + 1, std::vector<Pair>(2 * m_radius + 1, {0, 0}));
+    std::vector<float> heights(sq(m_detail + 1));
+    for (int x = -m_radius + 1; x < m_radius; ++x)
     {
-        for (int j = 0; j < m; ++j)
+        for (int y = -m_radius + 1; y < m_radius; ++y)
         {
-            elements.push_back((m + 1) * i + j);
-            elements.push_back((m + 1) * i + j + 1);
-            elements.push_back((m + 1) * (i + 1) + j);
-
-            elements.push_back((m + 1) * (i + 1) + j + 1);
-            elements.push_back((m + 1) * i + j + 1);
-            elements.push_back((m + 1) * (i + 1) + j);
+            generateChunk(x, y, heights);
+            updateChunk(x, y, x, y, heights);
         }
     }
-
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW);
-
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 sizeof(GLint) * elements.size(), elements.data(), GL_STATIC_DRAW);
-
-
-    m_shader.loadShaderFile("shaders/shader.vert", fly::Shader::Vertex);
-    m_shader.loadShaderFile("shaders/shader.frag", fly::Shader::Fragment);
-    m_shader.use();
-    m_shader.setAttributeFloat("position", 3, sizeof(Vertex), offsetof(Vertex, position));
-    m_shader.setAttributeFloat("texcoords", 2, sizeof(Vertex), offsetof(Vertex, texcoords));
-
-
-    m_shader.setUniform("tex", TextureManager::getSampler("resources/texture.png"));
-    m_shader.setUniform("model", glm::mat4(1.f));
-
-    glm::mat4 view = glm::lookAt(
-        glm::vec3(1.2f, 1.2f, 1.2f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f)
-        );
-    m_shader.setUniform("view", view);
-
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 1.0f, 10.0f);
-    m_shader.setUniform("proj", proj);
-    ASSERT_GL_ERRORS();
 }
 
 void Terrain::draw()
 {
-    glDrawElements(GL_TRIANGLES, elements.size(), GL_UNSIGNED_INT, 0);
+    m_renderer.draw();
 }
 
-Terrain::~Terrain()
+void Terrain::moveCenter(const glm::vec2& displacement)
 {
-    glDeleteBuffers(1, &ebo);
-    glDeleteBuffers(1, &vertexBuffer);
+    // TODO Make it so that crossing a chunk boundary back and forth doesn't cause thrashing
+
+    m_center += displacement;
+
+    int dx_chunk = static_cast<int>(m_center.x) - m_centerChunk.x;
+    int dy_chunk = static_cast<int>(m_center.y) - m_centerChunk.y;
+    if (dx_chunk != 0)
+    {
+        LOG(Debug) << "dx" << dx_chunk << __func__ << std::endl;
+        assert(std::abs(dx_chunk) == 1);
+
+        std::vector<float> heights(sq(m_detail + 1));
+        int chunk_x = mod_pos((m_centerChunk.x + (m_radius - 1) - (m_radius - 1) * dx_chunk),
+                              (2 * m_radius - 1)) - (m_radius  - 1);
+        for (int chunk_y = -m_radius + 1; chunk_y < m_radius; ++chunk_y)
+        {
+            int y = m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1].y;
+            // dx_chunk is +1 or -1
+            generateChunk(m_centerChunk.x + m_radius * dx_chunk, y, heights);
+            updateChunk(chunk_x, chunk_y, m_centerChunk.x + m_radius * dx_chunk, y, heights);
+        }
+        m_centerChunk.x +=  dx_chunk;
+    }
+
+    if (dy_chunk != 0)
+    {
+        LOG(Debug) << "dy" << __func__ << std::endl;
+        assert(std::abs(dy_chunk) == 1);
+
+        std::vector<float> heights(sq(m_detail + 1));
+        int chunk_y = mod_pos((m_centerChunk.y + (m_radius - 1) - (m_radius - 1) * dy_chunk),
+                              (2 * m_radius - 1)) - (m_radius  - 1);
+        for (int chunk_x = -m_radius + 1; chunk_x < m_radius; ++chunk_x)
+        {
+            int x = m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1].x;
+            generateChunk(x, m_centerChunk.y + m_radius * dy_chunk, heights);
+            updateChunk(chunk_x, chunk_y, x, m_centerChunk.y + m_radius * dy_chunk, heights);
+        }
+
+        m_centerChunk.y +=  dy_chunk;
+    }
 
 }
 

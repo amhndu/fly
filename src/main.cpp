@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "TextureManager.h"
 #include "Camera.h"
+#include "Controller.h"
 
 int main()
 {
@@ -27,10 +28,10 @@ int main()
     sf::Window window(sf::VideoMode(800, 600), "OpenGL sandbox", sf::Style::Default, settings);
     {
         auto c = window.getSettings();
-        LOG(Debug) << "OpenGL version: " << c.majorVersion << '.' << c.minorVersion << std::endl;
+        LOG(Info) << "OpenGL context: " << c.majorVersion << '.' << c.minorVersion << std::endl;
     }
 
-    window.setMouseCursorGrabbed(true);
+    // window.setMouseCursorGrabbed(true);
     window.setMouseCursorVisible(false);
 
     // GLEW Init
@@ -45,13 +46,15 @@ int main()
     TextureManager::uploadFile("resources/texture.png");
     ShaderProgram shader;
     Camera camera(shader,
-                  {-1.0f, 0.3f, -1.0f},
-                  glm::normalize(glm::vec3{0.8f, -0.1f, 0.6f}),
-                  glm::vec3(0.0f, 1.0f, 0.0f),
-                  glm::perspective(glm::radians(45.0f), 1.f * window.getSize().x / window.getSize().y, 0.05f, 10.0f),
-                  window);
-    Terrain terrain(shader);
-    terrain.generate(50);
+                  {0.f, 0.0f, 1.3f},
+                  glm::normalize(glm::vec3{-1.0f, 0.0f, -0.3f}),
+                  glm::vec3(0.0f, 0.0f, 1.0f),
+                  glm::perspective(glm::radians(45.0f), 1.f * window.getSize().x / window.getSize().y, 0.05f, 50.0f));
+    Terrain terrain(shader, 3, 25);
+    terrain.generate();
+    Controller controller(window);
+    controller.registerMove([&](float x, float y, float z){ terrain.moveCenter(camera.move(x, y, z));});
+    controller.registerRotate([&](float x, float y){ camera.rotate(x, y); });
 
     glEnable(GL_DEPTH_TEST);
 
@@ -80,11 +83,13 @@ int main()
         auto now = std::chrono::steady_clock::now();
         while (focus && now - prev_time > frame_period)
         {
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClearColor(0.7f, 1.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            camera.updateView(frame_period_seconds);
             terrain.draw();
+            // updateView after draw, so that the vao is bound by the call
+            controller.takeInput(frame_period_seconds);
+            camera.updateView();
 
             window.display();
 

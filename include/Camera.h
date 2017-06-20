@@ -11,13 +11,13 @@ class Camera
 {
 public:
     Camera(ShaderProgram& shader, glm::vec3 position, glm::vec3 direction, glm::vec3 up,
-           glm::mat4 defaultProj, sf::Window& window);
-    void updateView(float dt);
+           glm::mat4 defaultProj);
+    void updateView();
+    void rotate(float x, float y);
+    glm::vec2 move(float dx, float dy, float dz);
 private:
     ShaderProgram& m_shader;
-    sf::Window& m_window;
 
-    sf::Vector2i m_prevMouse;
     glm::vec3 m_position;
     glm::vec3 m_direction;
     glm::vec3 m_up;
