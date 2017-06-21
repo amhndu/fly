@@ -42,8 +42,8 @@ void Camera::updateView()
 glm::vec2 Camera::move(float dx, float dy, float dz)
 {
     glm::vec3 delta (0.f, 0.f, 0.f);
-    // delta += glm::normalize(m_direction) * dx;
-    delta += glm::normalize(glm::vec3{m_direction.x, m_direction.y, 0.f}) * dx;
+//     delta += glm::normalize(glm::vec3{m_direction.x, m_direction.y, 0.f}) * dx;
+    delta += glm::normalize(m_direction) * dx;
     delta += glm::normalize(glm::cross(m_up, m_direction)) * (-dy);
     delta += m_up * dz;
     m_position += delta;

@@ -23,9 +23,13 @@ TerrainRenderer::TerrainRenderer(ShaderProgram& shader, int radius, int detail) 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer);
 
     if (m_shaderProgram.loadShaderFile("shaders/shader.vert", Shader::Vertex))
+    {
         LOG(Info) << "Loaded Vertex shader" << std::endl;
+    }
     if (m_shaderProgram.loadShaderFile("shaders/shader.frag", Shader::Fragment))
+    {
         LOG(Info) << "Loaded Fragment shader" << std::endl;
+    }
 
     ASSERT_GL_ERRORS();
 }
@@ -45,7 +49,7 @@ void TerrainRenderer::reset(int radius, int detail)
 
     m_chunks = sq(2 * radius - 1);
     m_elementsPerChunk = 2 * 3 * sq(detail);
-    m_verticesPerChunk = sq(detail + 1); //4 * sq(detail); FIXME
+    m_verticesPerChunk = sq(detail + 1);
 
     LOG(Info) << "Terrain radius: " << m_radius << std::endl;
     LOG(Info) << "Terrain detail: " << m_detail << std::endl;
@@ -77,7 +81,10 @@ void TerrainRenderer::draw()
     glDrawElements(GL_TRIANGLES, m_elementsPerChunk * m_chunks, GL_UNSIGNED_INT, 0);
 }
 
-void TerrainRenderer::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& chunk_heights)
+void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
+                                  int coord_x, int coord_y,
+                                  float texture_size_x, float texture_size_y,
+                                  const std::vector<float>& chunk_heights)
 {
     std::vector<Vertex> vertices;
     vertices.reserve(m_verticesPerChunk);
@@ -85,15 +92,15 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y, int coord_x, int coo
     {
         for (int j = 0; j <= m_detail; ++j, ++c)
         {
-            float x = coord_x + 1.0f * i / (float)m_detail - 0.5f,
-                  y = coord_y + 1.0f * j / (float)m_detail - 0.5f;
+            float x = coord_x + 1.0f * i / m_detail - 0.5f,
+                  y = coord_y + 1.0f * j / m_detail - 0.5f;
             GLfloat height = chunk_heights[c];
-            vertices.push_back({{x, y, height}, {x - coord_x, y - coord_y}});
+            vertices.push_back({{x, y, height},
+                               {(x + 0.5f) / texture_size_x, (y + 0.5f) / texture_size_y}});
         }
     }
 
     auto offset = (chunk_x + m_radius - 1) * (2 * m_radius - 1) + (chunk_y + m_radius - 1);
-//     LOG(Debug) << "Offset: " << offset << std::endl;
 
     std::vector<GLuint> elements;
     elements.reserve(m_elementsPerChunk);

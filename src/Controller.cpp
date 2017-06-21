@@ -21,7 +21,7 @@ void Controller::takeInput(float dt)
     using Key       = sf::Keyboard;
     auto  isPressed = sf::Keyboard::isKeyPressed;
 
-    const float velocity = 1.0f;
+    const float velocity = 0.5f;
     float dx = 0, dy = 0, dz = 0;
     bool moved = false;
     if (isPressed(Key::W) || isPressed(Key::Up))

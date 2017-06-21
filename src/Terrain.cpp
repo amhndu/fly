@@ -22,7 +22,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            float height = scaled_octave_noise_3d(4.f, 0.4f, 1.f, 0.f, 0.4f, x, y, 5.14f);
+            float height = scaled_octave_noise_3d(4.f, 0.5f, 1.f, 0.f, 0.6f, x, y, 5.14f);
             heights[c] = height;
         }
     }
@@ -31,13 +31,13 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
 void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& heights)
 {
     m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1] = {coord_x, coord_y};
-    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, heights);
+    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, 0.15f, 0.15f, heights);
 }
 
 void Terrain::generate()
 {
     m_renderer.reset(m_radius, m_detail);
-    m_chunkMap.resize(2 * m_radius + 1, std::vector<Pair>(2 * m_radius + 1, {0, 0}));
+    m_chunkMap.resize(2 * m_radius - 1, std::vector<Pair>(2 * m_radius - 1, {0, 0}));
     std::vector<float> heights(sq(m_detail + 1));
     for (int x = -m_radius + 1; x < m_radius; ++x)
     {
@@ -64,12 +64,11 @@ void Terrain::moveCenter(const glm::vec2& displacement)
     int dy_chunk = static_cast<int>(m_center.y) - m_centerChunk.y;
     if (dx_chunk != 0)
     {
-        LOG(Debug) << "dx" << dx_chunk << __func__ << std::endl;
         assert(std::abs(dx_chunk) == 1);
 
         std::vector<float> heights(sq(m_detail + 1));
-        int chunk_x = mod_pos((m_centerChunk.x + (m_radius - 1) - (m_radius - 1) * dx_chunk),
-                              (2 * m_radius - 1)) - (m_radius  - 1);
+        int chunk_x = mod_pos(m_centerChunk.x + (m_radius - 1) - (m_radius - 1) * dx_chunk,
+                              2 * m_radius - 1) - (m_radius  - 1);
         for (int chunk_y = -m_radius + 1; chunk_y < m_radius; ++chunk_y)
         {
             int y = m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1].y;
@@ -82,12 +81,11 @@ void Terrain::moveCenter(const glm::vec2& displacement)
 
     if (dy_chunk != 0)
     {
-        LOG(Debug) << "dy" << __func__ << std::endl;
         assert(std::abs(dy_chunk) == 1);
 
         std::vector<float> heights(sq(m_detail + 1));
-        int chunk_y = mod_pos((m_centerChunk.y + (m_radius - 1) - (m_radius - 1) * dy_chunk),
-                              (2 * m_radius - 1)) - (m_radius  - 1);
+        int chunk_y = mod_pos(m_centerChunk.y + (m_radius - 1) - (m_radius - 1) * dy_chunk,
+                              2 * m_radius - 1) - (m_radius  - 1);
         for (int chunk_x = -m_radius + 1; chunk_x < m_radius; ++chunk_x)
         {
             int x = m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1].x;
@@ -97,7 +95,6 @@ void Terrain::moveCenter(const glm::vec2& displacement)
 
         m_centerChunk.y +=  dy_chunk;
     }
-
 }
 
 }

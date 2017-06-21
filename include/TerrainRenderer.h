@@ -17,7 +17,10 @@ public:
     TerrainRenderer(ShaderProgram& shader, int radius, int detail);
     ~TerrainRenderer();
     void reset(int radius, int detail);
-    void updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& chunk_heights);
+    void updateChunk(int chunk_x, int chunk_y,
+                     int coord_x, int coord_y,
+                     float texture_size_x, float texture_size_y,
+                     const std::vector<float>& chunk_heights);
     void draw();
 private:
     ShaderProgram& m_shaderProgram;
