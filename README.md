@@ -1,7 +1,7 @@
 Fly
 =====
 
-Supposed to be a flight simulator. Currently just a procedurally generated dummy terrain you can hover over.
+Supposed to be a flight simulator... albeit not a very good one.
 
 Dependencies:
 
@@ -11,4 +11,4 @@ Dependencies:
 
 Should be available in your repos. Once, installed, run cmake on the project directory.
 
-(Try: WASD, Space, Shift and moving the mouse. Esc to quit)
+(Try: WASD [or array keys] and moving the mouse. Esc to quit)

@@ -17,7 +17,7 @@ Airplane::Airplane() :
     m_rotationMatrix(1.f),
     m_aileron(0),
     m_elevator(0),
-    m_model("airplane.obj")
+    m_model("resources/airplane.obj")
 {
     auto transform = m_translationMatrix;
     m_model.setTransform(transform);
