@@ -9,28 +9,27 @@ namespace fly
 {
 
 
-TerrainRenderer::TerrainRenderer(ShaderProgram& shader, int radius, int detail) :
-        m_shaderProgram(shader),
+TerrainRenderer::TerrainRenderer(int radius, int detail) :
         m_radius(radius),
         m_detail(detail)
 {
-    glGenVertexArrays(1, &m_vertexArrayObject);
-    glBindVertexArray(m_vertexArrayObject);
+    m_vao.bind();
 
     glGenBuffers(1, &m_vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
     glGenBuffers(1, &m_elementBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementBuffer);
 
-    if (m_shaderProgram.loadShaderFile("shaders/shader.vert", Shader::Vertex))
+    if (m_shaderProgram.loadShaderFile("shaders/terrain.vert", Shader::Vertex))
     {
         LOG(Info) << "Loaded Vertex shader" << std::endl;
     }
-    if (m_shaderProgram.loadShaderFile("shaders/shader.frag", Shader::Fragment))
+    if (m_shaderProgram.loadShaderFile("shaders/terrain.frag", Shader::Fragment))
     {
         LOG(Info) << "Loaded Fragment shader" << std::endl;
     }
 
+    m_vao.unbind();
     ASSERT_GL_ERRORS();
 }
 
@@ -38,7 +37,6 @@ TerrainRenderer::~TerrainRenderer()
 {
     glDeleteBuffers(1, &m_vertexBuffer);
     glDeleteBuffers(1, &m_elementBuffer);
-    glDeleteVertexArrays(1, &m_vertexArrayObject);
     ASSERT_GL_ERRORS();
 }
 
@@ -57,7 +55,8 @@ void TerrainRenderer::reset(int radius, int detail)
     LOG(Info) << "Elements per chunk: " << m_elementsPerChunk << std::endl;
     LOG(Info) << "Vertices per chunk: " << m_verticesPerChunk << std::endl;
 
-    glBindVertexArray(m_vertexArrayObject);
+    m_vao.bind();
+    // TODO Profile against GL_STATIC_DRAW
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * m_verticesPerChunk * m_chunks,
                  nullptr, GL_DYNAMIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m_elementsPerChunk * m_chunks,
@@ -67,18 +66,20 @@ void TerrainRenderer::reset(int radius, int detail)
     m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(Vertex), offsetof(Vertex, texcoords));
 
     m_shaderProgram.use();
-    /* Move this setUniforms to constructor ? */
+
     m_shaderProgram.setUniform("tex", TextureManager::getSampler("resources/texture.png"));
     m_shaderProgram.setUniform("model", glm::mat4(1.f));
 
     ASSERT_GL_ERRORS();
+    m_vao.unbind();
 }
 
 void TerrainRenderer::draw()
 {
-    glBindVertexArray(m_vertexArrayObject);
+    m_vao.bind();
     m_shaderProgram.use();
     glDrawElements(GL_TRIANGLES, m_elementsPerChunk * m_chunks, GL_UNSIGNED_INT, 0);
+    m_vao.unbind();
 }
 
 void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
@@ -118,18 +119,17 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
         }
     }
 
-    assert(elements.size() == m_elementsPerChunk);
-    assert(vertices.size() == m_verticesPerChunk);
+    assert(elements.size() == (uint)m_elementsPerChunk);
+    assert(vertices.size() == (uint)m_verticesPerChunk);
 
-
-    glBindVertexArray(m_vertexArrayObject);
-
+    m_vao.bind();
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);      // VAO doesn't store VBOs
     glBufferSubData(GL_ARRAY_BUFFER, sizeof(Vertex) * m_verticesPerChunk * offset,
                     sizeof(Vertex) * m_verticesPerChunk, vertices.data());
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m_elementsPerChunk * offset,
                     sizeof(GLuint) * m_elementsPerChunk, elements.data());
-
     ASSERT_GL_ERRORS();
+    m_vao.unbind();
 }
 
 

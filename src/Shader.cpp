@@ -91,26 +91,29 @@ bool ShaderProgram::setAttributeFloat(const std::string& name, GLsizei size, GLs
         LOG(Error) << "Attribute \"" << name << "\" is either reserved or not found" << std::endl;
         return false;
     }
-    glEnableVertexAttribArray(attrib);
     glVertexAttribPointer(attrib, size, GL_FLOAT, GL_FALSE,
                           stride, reinterpret_cast<void*>(offset));
+    glEnableVertexAttribArray(attrib);
     return ASSERT_GL_ERRORS();
 }
 
 bool ShaderProgram::setUniform(GLint uniform, float value)
 {
+    use();
     glUniform1f(uniform, value);
     return ASSERT_GL_ERRORS();
 }
 
 bool ShaderProgram::setUniform(GLint uniform, int value)
 {
+    use();
     glUniform1i(uniform, value);
     return ASSERT_GL_ERRORS();
 }
 
 bool ShaderProgram::setUniform(GLint uniform, const glm::mat4& matrix)
 {
+    use();
     glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(matrix));
     return ASSERT_GL_ERRORS();
 }

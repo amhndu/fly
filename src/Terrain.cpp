@@ -22,7 +22,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            float height = scaled_octave_noise_3d(4.f, 0.5f, 1.f, 0.f, 0.6f, x, y, 5.14f);
+            float height = scaled_octave_noise_3d(4.f, 0.2f, 1.0f, 0.f, 0.6f, x, y, m_seed);
             heights[c] = height;
         }
     }
@@ -34,8 +34,9 @@ void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, co
     m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, 0.15f, 0.15f, heights);
 }
 
-void Terrain::generate()
+void Terrain::generate(float seed)
 {
+    m_seed = seed;
     m_renderer.reset(m_radius, m_detail);
     m_chunkMap.resize(2 * m_radius - 1, std::vector<Pair>(2 * m_radius - 1, {0, 0}));
     std::vector<float> heights(sq(m_detail + 1));

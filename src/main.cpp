@@ -1,15 +1,13 @@
 #include <chrono>
 #include <SFML/Window.hpp>
-#include <SFML/Graphics/Image.hpp>
-#include <GL/glew.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <GL/glew.h>
 #include "Terrain.h"
 #include "Log.h"
 #include "TextureManager.h"
 #include "Camera.h"
 #include "Controller.h"
+#include "Airplane.h"
 
 int main()
 {
@@ -29,6 +27,10 @@ int main()
     {
         auto c = window.getSettings();
         LOG(Info) << "OpenGL context: " << c.majorVersion << '.' << c.minorVersion << std::endl;
+        if (c.majorVersion < 3 && c.minorVersion < 2)
+        {
+            LOG(Error) << "Incapable OpenGL context" << std::endl;
+        }
     }
 
     // window.setMouseCursorGrabbed(true);
@@ -38,25 +40,39 @@ int main()
     glewExperimental = GL_TRUE;
     glewInit();
 
-    // Vertex Array Object to store the attributes/shaders config
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
     TextureManager::uploadFile("resources/texture.png");
-    ShaderProgram shader;
-    Camera camera(shader,
-                  {0.f, 0.0f, 1.3f},
-                  glm::normalize(glm::vec3{-1.0f, 0.0f, -0.3f}),
-                  glm::vec3(0.0f, 0.0f, 1.0f),
-                  glm::perspective(glm::radians(45.0f), 1.f * window.getSize().x / window.getSize().y, 0.05f, 50.0f));
-    Terrain terrain(shader, 5, 20);
-    terrain.generate();
+
+    glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
+                                                   1.f * window.getSize().x / window.getSize().y,
+                                                   0.05f, 50.0f);
+    Terrain terrain(6, 45);
+    terrain.generate(5.14f);
+    terrain.setProjection(projection_matrix);
+
+    Airplane aircraft;
+    aircraft.setProjection(projection_matrix);
+
+    Camera camera({0.0f, 0.0f, 1.1f},                            // Start position
+                  glm::normalize(glm::vec3{1.0f, 0.0f, -0.3f}),  // Direction
+                  glm::vec3(0.0f, 0.0f, 1.0f)                    // Up
+                  );
+
     Controller controller(window);
-    controller.registerMove([&](float x, float y, float z){ terrain.moveCenter(camera.move(x, y, z));});
+    controller.registerMove([&](float x, float y, float z)
+    {
+        if (std::abs(y) > 1e-5)
+            aircraft.roll(y / std::abs(y));
+        if (std::abs(x) > 1e-5)
+            aircraft.elevate(x / std::abs(x));
+        //terrain.moveCenter(camera.move(x, y, z));
+    });
     controller.registerRotate([&](float x, float y){ camera.rotate(x, y); });
 
     glEnable(GL_DEPTH_TEST);
+
+    /* Wireframe mode
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    //*/
 
     auto prev_time = std::chrono::steady_clock::now();
     const std::chrono::steady_clock::duration frame_period(std::chrono::milliseconds(1000/60));
@@ -78,18 +94,30 @@ int main()
             }
             else if (event.type == sf::Event::LostFocus)
                 focus = false;
+            /*else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::G)
+                terrain.generate(rand() / 65536.f);*/
         }
 
         auto now = std::chrono::steady_clock::now();
         while (focus && now - prev_time > frame_period)
         {
+            controller.takeInput(frame_period_seconds);
+            if (camera.viewChanged())
+            {
+                glm::mat4 view = camera.getView();
+                terrain.setView(view);
+                aircraft.setView(view);
+            }
+            aircraft.update(frame_period_seconds);
+            camera.setPosition(aircraft.getPosition()/* + glm::vec3{-0.4f, 0.0f, 1.1f-0.9f}*/);
+//             camera.setDirection(aircraft.getForwardDirection());
+            terrain.setCenter(aircraft.getPosition() + glm::vec3{0.0f, 0.0f, 1.1f-0.9f});
+
             glClearColor(0.04f, 0.04f, 0.04f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             terrain.draw();
-            // updateView after draw, so that the vao is bound by the call
-            controller.takeInput(frame_period_seconds);
-            camera.updateView();
+            aircraft.draw();
 
             window.display();
 
@@ -98,7 +126,6 @@ int main()
         sf::sleep(sf::seconds(1.f/60.f));  // MinGW's this_thread::sleep_for doesn't work for some reason
     }
 
-    glDeleteVertexArrays(1, &vao);
     window.close();
     return 0;
 }

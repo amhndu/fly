@@ -25,7 +25,7 @@ bool TextureManager::priv_uploadFile(const std::string& path)
         LOG(Error) << "Couldn't load texture file" << std::endl;
         return false;
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getSize().x, image.getSize().y, 0, GL_RGBA,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getSize().x, image.getSize().y, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, image.getPixelsPtr());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

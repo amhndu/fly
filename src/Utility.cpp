@@ -14,10 +14,7 @@ bool assertGLErrorsImpl(const char* caller)
         LOG(Error) << "In `" << caller <<"' OpenGL error: " << err << std::endl;
         err = glGetError();
     }
-// #ifndef NDEBUG
-//     if (!no_errors)
-//         throw std::runtime_error(std::string("In `") + caller + "' OpenGL error: " + std::to_string(err));
-// #endif
+    assert(no_errors);
     return no_errors;
 }
 

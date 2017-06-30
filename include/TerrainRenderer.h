@@ -7,6 +7,7 @@
 #include <cstdint>
 #include "Shader.h"
 #include "Vertex.h"
+#include "VertexArrayObject.h"
 
 namespace fly
 {
@@ -14,7 +15,7 @@ namespace fly
 class TerrainRenderer
 {
 public:
-    TerrainRenderer(ShaderProgram& shader, int radius, int detail);
+    TerrainRenderer(int radius, int detail);
     ~TerrainRenderer();
     void reset(int radius, int detail);
     void updateChunk(int chunk_x, int chunk_y,
@@ -22,10 +23,12 @@ public:
                      float texture_size_x, float texture_size_y,
                      const std::vector<float>& chunk_heights);
     void draw();
+    void setView(const glm::mat4& view) { m_shaderProgram.setUniform("view", view); }
+    void setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }
 private:
-    ShaderProgram& m_shaderProgram;
+    ShaderProgram m_shaderProgram;
 
-    GLuint m_vertexArrayObject;
+    VertexArrayObject m_vao;
     GLuint m_vertexBuffer;
     GLuint m_elementBuffer;
 

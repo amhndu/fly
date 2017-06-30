@@ -10,14 +10,14 @@ namespace fly
 class Camera
 {
 public:
-    Camera(ShaderProgram& shader, glm::vec3 position, glm::vec3 direction, glm::vec3 up,
-           glm::mat4 defaultProj);
-    void updateView();
+    Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up);
+    bool viewChanged() const { return m_viewChanged; }
+    glm::mat4 getView();
     void rotate(float x, float y);
-    glm::vec2 move(float dx, float dy, float dz);
+    glm::vec2 move(const glm::vec3& dr);
+    void setPosition(const glm::vec3& pos) { m_position = pos; m_viewChanged = true; }
+    void setDirection(const glm::vec3& dir) { m_direction = dir; m_viewChanged = true; }
 private:
-    ShaderProgram& m_shader;
-
     glm::vec3 m_position;
     glm::vec3 m_direction;
     glm::vec3 m_up;
