@@ -49,11 +49,10 @@ void Airplane::update(float dt)
         m_up      = glm::normalize(m_rotationMatrix[2]);
     }
 
-    // Utter simplification of physics.
     auto thrust  =  m_forward * 35.0f;
     auto drag    = -glm::normalize(m_velocity) * (35.0f / sq(the_velocity)) * glm::dot(m_velocity, m_velocity);
-    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 25.f;
-    glm::vec3 lift    =  {0.f, 0.f, (m_up * (25.f / sq(the_velocity)) * sq(glm::dot(m_forward, m_velocity))).z};
+    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 15.f;
+    glm::vec3 lift    =  {0.f, 0.f, (m_up * (15.f / sq(the_velocity)) * sq(glm::dot(m_forward, m_velocity))).z};
 
 
     float sine = std::sqrt(1 - sq(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})));

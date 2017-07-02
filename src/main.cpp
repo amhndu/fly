@@ -42,27 +42,30 @@ int main()
 
     TextureManager::uploadFile("resources/texture.png");
 
+    // The default projection matrix
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
                                                    1.f * window.getSize().x / window.getSize().y,
                                                    0.05f, 50.0f);
-    Terrain terrain(8, 25);
-    terrain.generate(5.14f);
+    Terrain terrain(10, 20);
+    terrain.generate(5.14f);    // a constant seed for now
     terrain.setProjection(projection_matrix);
 
     Airplane aircraft;
     aircraft.setProjection(projection_matrix);
 
-    Camera camera({0.0f, 0.0f, 1.1f},                            // Start position
-                  glm::normalize(glm::vec3{1.0f, 0.0f, -0.3f}),  // Direction
-                  glm::vec3(0.0f, 0.0f, 1.0f),                   // Up
+    Camera camera(aircraft.getPosition(),                // Start position
+                  aircraft.getForwardDirection(),       // Direction
+                  aircraft.getUpDirection(),           // Up
                   aircraft);
 
+    // Set up input callbacks
     Controller controller(window);
-    controller.setCallback(Controller::RollLeft,     std::bind(&Airplane::roll, &aircraft, -1));
-    controller.setCallback(Controller::RollRight,    std::bind(&Airplane::roll, &aircraft, +1));
+    controller.setCallback(Controller::RollLeft,     std::bind(&Airplane::roll,    &aircraft, -1));
+    controller.setCallback(Controller::RollRight,    std::bind(&Airplane::roll,    &aircraft, +1));
     controller.setCallback(Controller::ElevatorUp,   std::bind(&Airplane::elevate, &aircraft, -1));
     controller.setCallback(Controller::ElevatorDown, std::bind(&Airplane::elevate, &aircraft, +1));
 
+    // GL setup
     glEnable(GL_DEPTH_TEST);
 
     /* Wireframe mode
