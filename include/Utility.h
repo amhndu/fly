@@ -11,9 +11,15 @@ namespace fly
 bool assertGLErrorsImpl(const char* caller);
 
 template <typename T>
-T sq(T val)
+constexpr inline T sq(T val)
 {
     return val * val;
+}
+
+template <typename T>
+constexpr inline T sign(T x)
+{
+    return x != 0 ? x / std::abs(x) : 0;
 }
 
 

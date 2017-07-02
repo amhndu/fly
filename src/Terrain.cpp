@@ -22,7 +22,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            float height = scaled_octave_noise_3d(4.f, 0.2f, 1.0f, 0.f, 0.6f, x, y, m_seed);
+            float height = scaled_octave_noise_3d(4.f, 0.2f, 0.4f, 0.f, 1.5f, x, y, m_seed);
             heights[c] = height;
         }
     }

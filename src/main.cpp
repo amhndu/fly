@@ -34,7 +34,7 @@ int main()
     }
 
     // window.setMouseCursorGrabbed(true);
-    window.setMouseCursorVisible(false);
+    // window.setMouseCursorVisible(false);
 
     // GLEW Init
     glewExperimental = GL_TRUE;
@@ -45,7 +45,7 @@ int main()
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
                                                    1.f * window.getSize().x / window.getSize().y,
                                                    0.05f, 50.0f);
-    Terrain terrain(6, 45);
+    Terrain terrain(8, 25);
     terrain.generate(5.14f);
     terrain.setProjection(projection_matrix);
 
@@ -54,19 +54,14 @@ int main()
 
     Camera camera({0.0f, 0.0f, 1.1f},                            // Start position
                   glm::normalize(glm::vec3{1.0f, 0.0f, -0.3f}),  // Direction
-                  glm::vec3(0.0f, 0.0f, 1.0f)                    // Up
-                  );
+                  glm::vec3(0.0f, 0.0f, 1.0f),                   // Up
+                  aircraft);
 
     Controller controller(window);
-    controller.registerMove([&](float x, float y, float z)
-    {
-        if (std::abs(y) > 1e-5)
-            aircraft.roll(y / std::abs(y));
-        if (std::abs(x) > 1e-5)
-            aircraft.elevate(x / std::abs(x));
-        //terrain.moveCenter(camera.move(x, y, z));
-    });
-    controller.registerRotate([&](float x, float y){ camera.rotate(x, y); });
+    controller.setCallback(Controller::RollLeft,     std::bind(&Airplane::roll, &aircraft, -1));
+    controller.setCallback(Controller::RollRight,    std::bind(&Airplane::roll, &aircraft, +1));
+    controller.setCallback(Controller::ElevatorUp,   std::bind(&Airplane::elevate, &aircraft, -1));
+    controller.setCallback(Controller::ElevatorDown, std::bind(&Airplane::elevate, &aircraft, +1));
 
     glEnable(GL_DEPTH_TEST);
 
@@ -102,20 +97,20 @@ int main()
         while (focus && now - prev_time > frame_period)
         {
             controller.takeInput(frame_period_seconds);
+
+            aircraft.update(frame_period_seconds);
+            terrain.setCenter(aircraft.getPosition());
+            camera.updateView(frame_period_seconds);
+
+            glClearColor(0.04f, 0.04f, 0.04f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             if (camera.viewChanged())
             {
                 glm::mat4 view = camera.getView();
                 terrain.setView(view);
                 aircraft.setView(view);
             }
-            aircraft.update(frame_period_seconds);
-            camera.setPosition(aircraft.getPosition()/* + glm::vec3{-0.4f, 0.0f, 1.1f-0.9f}*/);
-//             camera.setDirection(aircraft.getForwardDirection());
-            terrain.setCenter(aircraft.getPosition() + glm::vec3{0.0f, 0.0f, 1.1f-0.9f});
-
-            glClearColor(0.04f, 0.04f, 0.04f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
             terrain.draw();
             aircraft.draw();
 
