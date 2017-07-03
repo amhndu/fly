@@ -30,7 +30,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            float height = (m_noise.fractal(4.f, x, y) + 0.5f) * 0.8f;
+            float height = (m_noise.fractal(4.f, x, y) + 0.5f) * 1.0f;
             heights[c] = height;
         }
     }
