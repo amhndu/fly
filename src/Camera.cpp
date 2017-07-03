@@ -21,7 +21,7 @@ glm::mat4 Camera::getView()
 {
     if (m_viewChanged)
     {
-        m_view = glm::lookAt(m_position - m_direction * 0.4f + m_up * 0.15f,  // eye
+        m_view = glm::lookAt(m_position - m_direction * 0.4f + m_up * 0.25f,  // eye
                              m_position,  // center
                              m_up);
         m_viewChanged = false;

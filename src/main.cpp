@@ -47,7 +47,7 @@ int main()
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
                                                    1.f * window.getSize().x / window.getSize().y,
                                                    0.05f, 50.0f);
-    Terrain terrain(6, 20);
+    Terrain terrain(8, 20);
     terrain.generate(5.14f);    // a constant seed for now
     terrain.setProjection(projection_matrix);
 
@@ -106,7 +106,7 @@ int main()
             terrain.setCenter(aircraft.getPosition());
             camera.updateView(frame_period_seconds);
 
-            glClearColor(0.04f, 0.04f, 0.04f, 1.0f);
+            glClearColor(100.f / 255.f, 250.f / 255.f, 255.f / 255.f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             if (camera.viewChanged())
