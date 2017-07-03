@@ -20,6 +20,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/;${CMAKE_MODULE_PATH};$
 # Add sources
 file(GLOB SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
+    "${PROJECT_SOURCE_DIR}/extlibs/src/SimplexNoise.cpp"
 )
 
 # if (CMAKE_BUILD_TYPE STREQUAL "Debug")

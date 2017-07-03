@@ -2,6 +2,7 @@
 #define TERRAIN_H
 
 #include <vector>
+#include <SimplexNoise.h>
 #include "TerrainRenderer.h"
 
 
@@ -12,9 +13,7 @@ namespace fly
 class Terrain
 {
 public:
-    Terrain(int radius, int detail) :
-            m_radius(radius), m_detail(detail), m_center(0.f, 0.f),
-            m_centerChunk{0, 0}, m_renderer(radius, detail) {}
+    Terrain(int radius, int detail);
     void generate(float seed);
     void draw();
     void moveCenter(const glm::vec2& displacement);
@@ -37,6 +36,9 @@ private:
     glm::vec2 m_center;
     Pair m_centerChunk;
     std::vector<std::vector<Pair>> m_chunkMap;
+
+    SimplexNoise m_noise;
+
     TerrainRenderer m_renderer;
 };
 

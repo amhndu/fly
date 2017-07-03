@@ -1,5 +1,4 @@
 #include "Terrain.h"
-#include "simplexnoise.h"
 #include "Log.h"
 #include "Utility.h"
 #include <glm/gtc/matrix_transform.hpp>
@@ -14,6 +13,15 @@ static int mod_pos(int a, int b)
     return (a % b + b) % b;
 }
 
+Terrain::Terrain(int radius, int detail) :
+            m_radius(radius),
+            m_detail(detail),
+            m_center(0.f, 0.f),
+            m_centerChunk{0, 0},
+            m_noise{1.f / 6.f, 0.5f, 4.f, 0.2f},
+            m_renderer(radius, detail)
+{}
+
 void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& heights)
 {
     for (int i = 0, c = 0; i <= m_detail; ++i)
@@ -22,8 +30,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            //float height = scaled_octave_noise_3d(1.f, 0.2f, 0.3f, 0.f, 0.7f, x, y, m_seed);
-            float height = scaled_octave_noise_3d(4.f, 0.2f, 0.3f, 0.f, 0.65f / 0.3f, x, y, m_seed);
+            float height = (m_noise.fractal(4.f, x, y) + 0.5f) * 0.8f;
             heights[c] = height;
         }
     }
@@ -32,7 +39,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
 void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& heights)
 {
     m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1] = {coord_x, coord_y};
-    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, 0.15f, 0.15f, heights);
+    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, 1.15f, 1.15f, heights);
 }
 
 void Terrain::generate(float seed)

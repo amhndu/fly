@@ -3,7 +3,7 @@
 in vec3 position;
 in vec2 texcoords;
 
-out vec2 Texcoords;
+out vec2  Texcoords;
 out float height;
 
 uniform mat4 model;

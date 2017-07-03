@@ -9,6 +9,6 @@ uniform sampler2D tex;
 
 void main()
 {
-    vec3 color = mix(vec3(0.14, 1.0, 0.31), vec3(0.40, 0.72, 0.46), 0);
-    outColor = texture(tex, Texcoords);
+    vec3 color = mix(vec3(0, 135.0 / 255.0, 49.0 / 255.0), vec3(0, 168.0 / 255, 62.0 / 255.0), height);
+    outColor = vec4(color, 1.0) * (texture(tex, Texcoords) / 3 + vec4(0.6, 0.6, 0.6, 0.6));
 }
