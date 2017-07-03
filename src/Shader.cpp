@@ -66,11 +66,11 @@ bool ShaderProgram::loadShaderFile(const std::string& path, Shader type)
     if (compile_status != GL_TRUE)
     {
         LOG(Error) << "Shader compilation failed." << std::endl;
-        LOG(Error) << "Compiler log: " << buffer << std::endl;
+        LOG(Error) << "Compiler log:\n" << buffer << std::endl;
     }
     else if (std::strlen(buffer) > 0)
     {
-        LOG(Debug) << "Compiler log: " << buffer << std::endl;
+        LOG(Debug) << "Compiler log:\n" << buffer << std::endl;
     }
 
     if (m_vertexShader != 0 && m_fragmentShader != 0) // if both have been supplied
@@ -116,6 +116,12 @@ bool ShaderProgram::setUniform(GLint uniform, const glm::mat4& matrix)
     use();
     glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(matrix));
     return ASSERT_GL_ERRORS();
+}
+
+bool ShaderProgram::setUniform(GLint uniform, const glm::vec3& vec)
+{
+    use();
+    glUniform3fv(uniform, 1, &vec[0]);
 }
 
 

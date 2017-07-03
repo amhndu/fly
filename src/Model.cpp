@@ -1,5 +1,6 @@
 #include <glm/gtc/matrix_transform.hpp>
-#include <objload.h>
+#include <OBJ_Loader.h>
+#include <unordered_map>
 #include "Model.h"
 #include "Log.h"
 #include "Utility.h"
@@ -7,7 +8,7 @@
 namespace fly
 {
 
-Model::Model(const std::string& model_path) : m_numElements(0)
+Model::Model(const std::string& model_path)
 {
     m_vao.bind();
 
@@ -25,23 +26,42 @@ Model::Model(const std::string& model_path) : m_numElements(0)
         LOG(Info) << "Loaded Fragment shader" << std::endl;
     }
 
-    std::ifstream file (model_path, std::ios_base::in | std::ios_base::binary);
-
-    if (file.is_open() && file.good())
+    objl::Loader loader;
+    if (loader.LoadFile(model_path))
     {
-        auto model =  obj::loadModelFromFile(model_path);
+        glBufferData(GL_ARRAY_BUFFER, loader.LoadedVertices.size() * sizeof(objl::Vertex),
+                     loader.LoadedVertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, loader.LoadedIndices.size() * sizeof(unsigned int),
+                     loader.LoadedIndices.data(), GL_STATIC_DRAW);
 
-        auto& vertices = model.vertex;
-        auto& elements = model.faces["default"];
-
-        m_numElements = elements.size();
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]),
-                     vertices.data(), GL_STATIC_DRAW);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_numElements * sizeof(elements[0]),
-                     elements.data(), GL_STATIC_DRAW);
-
-        m_shaderProgram.setAttributeFloat("position", 3, 3 * sizeof(float), 0);
         m_shaderProgram.use();
+        m_shaderProgram.setAttributeFloat("position",  3, sizeof(objl::Vertex), offsetof(objl::Vertex, Position));
+        m_shaderProgram.setAttributeFloat("normal",    3, sizeof(objl::Vertex), offsetof(objl::Vertex, Normal));
+        m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(objl::Vertex), offsetof(objl::Vertex, TextureCoordinate));
+        // TODO Remove texcoords (since I'm not using it)
+
+        std::unordered_map<std::string, std::size_t> materials_map;
+
+        for (const auto& m : loader.LoadedMaterials)
+        {
+            materials_map[m.name] = m_materials.size();
+            m_materials.push_back({
+                            {m.Ka.X, m.Ka.Y, m.Ka.Z},
+                            {m.Kd.X, m.Kd.Y, m.Kd.Z},
+                            //{m.Ks.X, m.Ks.Y, m.Ks.Z},
+                            //m.Ns
+                           });
+        }
+
+        uint offset = 0;
+        for (const auto& mesh : loader.LoadedMeshes)
+        {
+            LOG(Debug) << mesh.MeshName << std::endl;
+            m_meshes.push_back({mesh.MeshName, offset, static_cast<uint>(mesh.Indices.size()),
+                                m_materials.at(materials_map[mesh.MeshMaterial.name])});
+            offset += mesh.Indices.size();
+        }
+
     }
     else
         LOG(Error) << "Error in opening model file: " << model_path << std::endl;
@@ -60,7 +80,16 @@ void Model::draw()
 {
     m_vao.bind();
     m_shaderProgram.use();
-    glDrawElements(GL_TRIANGLES, m_numElements, GL_UNSIGNED_SHORT, 0);
+    for (auto& mesh : m_meshes)
+    {
+        m_shaderProgram.setUniform("ambient_color", mesh.material.ambient_color);
+        m_shaderProgram.setUniform("diffuse_color", mesh.material.diffuse_color);
+        //m_shaderProgram.setUniform("specular_exponent", mesh.material.specular_exponent);
+        //m_shaderProgram.setUniform("specular_color", mesh.material.specular_color);
+        glDrawElements(GL_TRIANGLES, mesh.elements_size, GL_UNSIGNED_INT,
+                       reinterpret_cast<void*>(mesh.elements_offset * sizeof(unsigned int)));
+    }
+//     glDrawElements(GL_TRIANGLES, total, GL_UNSIGNED_INT, 0);
     m_vao.unbind();
 }
 
