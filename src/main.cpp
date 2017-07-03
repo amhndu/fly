@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Controller.h"
 #include "Airplane.h"
+#include "Utility.h"
 
 int main()
 {

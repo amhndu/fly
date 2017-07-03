@@ -54,7 +54,6 @@ void Airplane::update(float dt)
     glm::vec3 gravity =  glm::vec3(0, 0, -1) * 15.f;
     glm::vec3 lift    =  {0.f, 0.f, (m_up * (15.f / sq(the_velocity)) * sq(glm::dot(m_forward, m_velocity))).z};
 
-
     float sine = std::sqrt(1 - sq(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})));
     if (sine != 0)
     {
@@ -62,7 +61,8 @@ void Airplane::update(float dt)
         auto centripetal = glm::normalize(glm::vec3{m_up.x, m_up.y, 0.f}) * glm::dot(m_velocity, m_velocity) / radius;
         lift += centripetal;
         // rotate the model and vectors
-        glm::vec3 axis = glm::inverse(m_rotationMatrix) * glm::vec4(0.f, 0.f, sign(glm::cross(m_velocity, centripetal).z), 0.f);
+        glm::vec3 axis = glm::inverse(m_rotationMatrix) *
+                         glm::vec4(0.f, 0.f, sign(glm::cross(m_velocity, centripetal).z, 1.f), 0.f);
         m_rotationMatrix = glm::rotate(m_rotationMatrix, glm::length(m_velocity) / radius * dt, axis);
         m_forward = glm::normalize(m_rotationMatrix[0]);
         m_left    = glm::normalize(m_rotationMatrix[1]);
@@ -74,6 +74,7 @@ void Airplane::update(float dt)
     m_velocity += acceleration * dt;
 
     m_position += m_velocity * dt;
+
     m_translationMatrix = glm::translate({}, m_position);
 
     auto transform = m_translationMatrix * m_rotationMatrix;

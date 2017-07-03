@@ -22,7 +22,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            float height = scaled_octave_noise_3d(4.f, 0.2f, 0.3f, 0.f, 0.7f / 0.3f, x, y, m_seed);
+            float height = scaled_octave_noise_3d(8.f, 0.3f, 0.3f, 0.f, 0.7f / 0.3f, x, y, m_seed);
             heights[c] = height;
         }
     }
@@ -71,7 +71,7 @@ void Terrain::moveCenter(const glm::vec2& displacement)
         int chunk_x = mod_pos(m_centerChunk.x + (m_radius - 1) - (m_radius - 1) * dx_chunk,
                               2 * m_radius - 1) - (m_radius  - 1);
         for (int chunk_y = -m_radius + 1; chunk_y < m_radius; ++chunk_y)
-        {
+        { \
             int y = m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1].y;
             // dx_chunk is +1 or -1
             generateChunk(m_centerChunk.x + m_radius * dx_chunk, y, heights);

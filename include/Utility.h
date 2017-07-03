@@ -17,9 +17,9 @@ constexpr inline T sq(T val)
 }
 
 template <typename T>
-constexpr inline T sign(T x)
+constexpr inline T sign(T x, T on_zero = 0)
 {
-    return x != 0 ? x / std::abs(x) : 0;
+    return x != 0 ? x / std::abs(x) : on_zero;
 }
 
 

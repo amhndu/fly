@@ -61,7 +61,6 @@ Model::Model(const std::string& model_path)
                                 m_materials.at(materials_map[mesh.MeshMaterial.name])});
             offset += mesh.Indices.size();
         }
-
     }
     else
         LOG(Error) << "Error in opening model file: " << model_path << std::endl;
@@ -89,7 +88,6 @@ void Model::draw()
         glDrawElements(GL_TRIANGLES, mesh.elements_size, GL_UNSIGNED_INT,
                        reinterpret_cast<void*>(mesh.elements_offset * sizeof(unsigned int)));
     }
-//     glDrawElements(GL_TRIANGLES, total, GL_UNSIGNED_INT, 0);
     m_vao.unbind();
 }
 
