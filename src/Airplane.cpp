@@ -43,7 +43,7 @@ void Airplane::update(float dt)
 
     if (m_elevator)
     {
-        float dAngle = (M_PI / 3.f * std::abs(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f}))) * m_elevator * dt;
+        float dAngle = (M_PI / 3.f * (std::abs(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})) * 0.9f + 0.1f)) * m_elevator * dt;
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngle, {0.f, 1.f, 0.f});
         m_forward = glm::normalize(m_rotationMatrix[0]);
         m_up      = glm::normalize(m_rotationMatrix[2]);
