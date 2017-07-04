@@ -48,8 +48,8 @@ Model::Model(const std::string& model_path)
             m_materials.push_back({
                             {m.Ka.X, m.Ka.Y, m.Ka.Z},
                             {m.Kd.X, m.Kd.Y, m.Kd.Z},
-                            //{m.Ks.X, m.Ks.Y, m.Ks.Z},
-                            //m.Ns
+                            {m.Ks.X, m.Ks.Y, m.Ks.Z},
+                            m.Ns
                            });
         }
 
@@ -82,8 +82,8 @@ void Model::draw()
     {
         m_shaderProgram.setUniform("ambient_color", mesh.material.ambient_color);
         m_shaderProgram.setUniform("diffuse_color", mesh.material.diffuse_color);
-        //m_shaderProgram.setUniform("specular_exponent", mesh.material.specular_exponent);
-        //m_shaderProgram.setUniform("specular_color", mesh.material.specular_color);
+        m_shaderProgram.setUniform("specular_exponent", mesh.material.specular_exponent);
+        m_shaderProgram.setUniform("specular_color", mesh.material.specular_color);
         glDrawElements(GL_TRIANGLES, mesh.elements_size, GL_UNSIGNED_INT,
                        reinterpret_cast<void*>(mesh.elements_offset * sizeof(unsigned int)));
     }

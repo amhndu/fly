@@ -20,7 +20,7 @@ void main()
     vec3 norm = normalize(Normal);
 
     // ambient
-    float ambient_strength = 0.4;
+    float ambient_strength = 0.2;
     vec3 ambient = ambient_strength * light_color * color;  // ambient strength = 0.1
 
     // diffuse

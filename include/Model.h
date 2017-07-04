@@ -26,8 +26,8 @@ private:
     {
         glm::vec3 ambient_color;
         glm::vec3 diffuse_color;
-        //glm::vec3 specular_color;
-        //float specular_exponent;
+        glm::vec3 specular_color;
+        float specular_exponent;
     };
 
     struct Mesh
