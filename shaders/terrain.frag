@@ -1,10 +1,10 @@
 #version 330 core
 
-in vec2  Texcoords;
 in vec3  Normal;
-in float Height;
 in vec3  LightDirection;
 in vec3  FragPosition;
+in float Height;
+in float Color;
 
 layout (location = 0) out vec4 outColor;
 
@@ -14,8 +14,8 @@ vec3 light_color = vec3( 1.0,  1.0,  1.0);
 
 void main()
 {
-    vec3 color = mix(vec3(0, 135.0 / 255.0, 49.0 / 255.0), vec3(0, 168.0 / 255, 62.0 / 255.0), Height);
-    color *= vec3(texture(tex, Texcoords)) / 3 + vec3(0.6, 0.6, 0.6);
+    //color *= vec3(texture(tex, Texcoords)) / 3 + vec3(0.6, 0.6, 0.6);
+    vec3 color = vec3(texture(tex, vec2(Color, 1.0 - (Height / 1.5))));
 
     vec3 norm = normalize(Normal);
 

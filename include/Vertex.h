@@ -10,7 +10,7 @@ struct Vertex
 {
     GLfloat position[3];
     GLfloat normal[3];
-    GLfloat texcoords[2];
+    GLfloat color;
 };
 
 

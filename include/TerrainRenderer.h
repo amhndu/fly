@@ -21,7 +21,8 @@ public:
     void updateChunk(int chunk_x, int chunk_y,
                      int coord_x, int coord_y,
                      float texture_size_x, float texture_size_y,
-                     const std::vector<float>& chunk_heights);
+                     const std::vector<float>& chunk_heights,
+                     const std::vector<float>& colormap);
     void draw();
     void setView(const glm::mat4& view) { m_shaderProgram.setUniform("view", view); }
     void setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }

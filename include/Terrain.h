@@ -20,8 +20,9 @@ public:
     void setView(const glm::mat4& view) { m_renderer.setView(view); }
     void setProjection(const glm::mat4& proj) { m_renderer.setProjection(proj); }
 private:
-    void generateChunk(int coord_x, int coord_y, std::vector<float>& heights);
-    void updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& heights);
+    void generateChunk(int coord_x, int coord_y, std::vector<float>& heights, std::vector<float>& color);
+    void updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y,
+                     const std::vector<float>& heights, const std::vector<float>& color);
 
     struct Pair
     {

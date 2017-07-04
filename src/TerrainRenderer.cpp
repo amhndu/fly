@@ -63,12 +63,12 @@ void TerrainRenderer::reset(int radius, int detail)
                  nullptr, GL_DYNAMIC_DRAW);
 
     m_shaderProgram.setAttributeFloat("position", 3, sizeof(Vertex), offsetof(Vertex, position));
-    m_shaderProgram.setAttributeFloat("normal", 3, sizeof(Vertex), offsetof(Vertex, normal));
-    m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(Vertex), offsetof(Vertex, texcoords));
+    m_shaderProgram.setAttributeFloat("normal"  , 3, sizeof(Vertex), offsetof(Vertex, normal));
+    m_shaderProgram.setAttributeFloat("color"   , 1, sizeof(Vertex), offsetof(Vertex, color));
 
     m_shaderProgram.use();
 
-    m_shaderProgram.setUniform("tex", TextureManager::getSampler("resources/texture.png"));
+    m_shaderProgram.setUniform("tex"  , TextureManager::getSampler("resources/texture.png"));
     m_shaderProgram.setUniform("model", glm::mat4(1.f));
 
     ASSERT_GL_ERRORS();
@@ -86,7 +86,8 @@ void TerrainRenderer::draw()
 void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
                                   int coord_x, int coord_y,
                                   float texture_size_x, float texture_size_y,
-                                  const std::vector<float>& chunk_heights)
+                                  const std::vector<float>& chunk_heights,
+                                  const std::vector<float>& colormap)
 {
     std::vector<Vertex> vertices;
     vertices.reserve(m_verticesPerChunk);
@@ -114,7 +115,7 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
             vertices.push_back({
                             {x, y, height},
                             {normal.x, normal.y, normal.z},
-                            {(x + 0.5f) / texture_size_x, (y + 0.5f) / texture_size_y}
+                            colormap[i * (m_detail + 1) + j]
             });
         }
     }
