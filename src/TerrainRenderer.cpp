@@ -90,21 +90,24 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
 {
     std::vector<Vertex> vertices;
     vertices.reserve(m_verticesPerChunk);
-    for (int i = 0, c = 0; i <= m_detail; ++i)
+    for (int i = 0, c = m_detail + 1 + 2 + 1; i <= m_detail; ++i, c += 2)
     {
         for (int j = 0; j <= m_detail; ++j, ++c)
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
 
-            float left  = chunk_heights[c - (i != 0 ? 1 : 0)];
-            float right = chunk_heights[c + (i != m_detail ? 1 : 0)];
-            float up    = chunk_heights[c - (j != 0 ? m_detail : 0)];
-            float down  = chunk_heights[c + (j != m_detail ? m_detail : 0)];
+            float left  = chunk_heights[c - 1];
+            float right = chunk_heights[c + 1];
+            float up    = chunk_heights[c - (m_detail + 1 + 2)];
+            float down  = chunk_heights[c + (m_detail + 1 + 2)];
 
-            glm::vec3 diff1 = {1.f / m_detail, 0.f, right - left};
-            glm::vec3 diff2 = {0.f, 1.f / m_detail, down  - up};
-            auto normal = glm::normalize(glm::cross(diff1, diff2));
+            /* glm::vec3 diff1 = {1.f / m_detail, 0.f, right - left};
+             * glm::vec3 diff2 = {0.f, 1.f / m_detail, down  - up};
+             * auto normal = glm::normalize(glm::cross(diff1, diff2));
+             * Simplified to:
+             */
+            auto normal = glm::normalize(glm::vec3{left - right, down - up, 1.f / m_detail});
 
             GLfloat height = chunk_heights[c];
             vertices.push_back({
