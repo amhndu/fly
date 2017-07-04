@@ -4,6 +4,7 @@ in vec2  Texcoords;
 in vec3  Normal;
 in float Height;
 in vec3  LightDirection;
+in vec3  FragPosition;
 
 layout (location = 0) out vec4 outColor;
 
@@ -26,5 +27,12 @@ void main()
     float diffuse_strength = 0.8;
     vec3 diffuse = diffuse_strength * max(dot(norm, LightDirection), 0.0) * light_color * color;
 
-    outColor = vec4(ambient + diffuse, 1.0);
+    vec3 final_color = ambient + diffuse;
+
+    float alpha = 1.0;
+    float distance = length(FragPosition);
+    if (distance >= 13.0)
+        alpha = 1.0 / (distance - 12.0);
+
+    outColor = vec4(mix(vec3(0.39, 0.98, 1.0), final_color, alpha), 1.0);
 }

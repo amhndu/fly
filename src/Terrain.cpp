@@ -20,7 +20,7 @@ Terrain::Terrain(int radius, int detail) :
             m_detail(detail),
             m_center(0.f, 0.f),
             m_centerChunk{0, 0},
-            m_noise{1.f / 6.f, 0.5f, 4.f, 0.2f},
+            m_noise{1.f / 6.f, 0.5f, 4.f, 0.15f},
             m_renderer(radius, detail)
 {}
 
@@ -33,7 +33,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            float height = (m_noise.fractal(4.f, x, y) + 0.5f) * 1.0f;
+            float height = (m_noise.fractal(4.f, x, y) + 0.5f) * 0.6f;
             heights[c] = height;
         }
     }
@@ -42,7 +42,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
 void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y, const std::vector<float>& heights)
 {
     m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1] = {coord_x, coord_y};
-    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, 1.00f, 1.00f, heights);
+    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, 2.50f, 2.50f, heights);
 }
 
 void Terrain::generate(float seed)

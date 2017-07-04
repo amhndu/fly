@@ -103,10 +103,11 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
             float down  = chunk_heights[c + (m_detail + 1 + 2)];
 
             /* glm::vec3 diff1 = {1.f / m_detail, 0.f, right - left};
-             * glm::vec3 diff2 = {0.f, 1.f / m_detail, down  - up};
-             * auto normal = glm::normalize(glm::cross(diff1, diff2));
-             * Simplified to:
-             */
+             glm::vec3 diff2 = {0.f, 1.f / m_detail, down  - up};
+             auto normal = glm::normalize(glm::cross(diff1, diff2));
+             Simplified to:
+            */
+
             auto normal = glm::normalize(glm::vec3{left - right, down - up, 1.f / m_detail});
 
             GLfloat height = chunk_heights[c];

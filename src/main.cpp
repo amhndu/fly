@@ -47,7 +47,7 @@ int main()
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
                                                    1.f * window.getSize().x / window.getSize().y,
                                                    0.05f, 50.0f);
-    Terrain terrain(12, 15);
+    Terrain terrain(15, 15);
     terrain.generate(5.14f);    // a constant seed for now
     terrain.setProjection(projection_matrix);
 
