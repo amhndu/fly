@@ -2,6 +2,7 @@
 #include "Log.h"
 #include "Utility.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <simplexnoise.h>
 #include <cassert>
 
 namespace fly
@@ -20,12 +21,12 @@ Terrain::Terrain(int radius, int detail) :
             m_detail(detail),
             m_center(0.f, 0.f),
             m_centerChunk{0, 0},
-            m_noise{1.f / 6.f, 0.5f, 4.f, 0.15f},
             m_renderer(radius, detail)
 {}
 
 void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& heights)
 {
+//             m_noise{1.f / 6.f, 1.f, 4.f, 0.15f},
     // Generate an extra square outside the chunk to faciliate normal calculations
     for (int i = -1, c = 0; i <= m_detail + 1; ++i)
     {
@@ -33,7 +34,8 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
-            float height = (m_noise.fractal(4.f, x, y) + 0.5f) * 0.6f;
+//             float height = 1.5f * std::pow((m_noise.fractal(4.f, x, y) + 1.f) / 2.f, 3.0f);
+            float height = 1.5f * std::pow(scaled_octave_noise_3d(4.f, 0.15f, 1.f / 6.f, 4.f, 0.f, 1.f, x, y, m_seed), 3.f);
             heights[c] = height;
         }
     }

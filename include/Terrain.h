@@ -2,7 +2,6 @@
 #define TERRAIN_H
 
 #include <vector>
-#include <SimplexNoise.h>
 #include "TerrainRenderer.h"
 
 
@@ -36,8 +35,6 @@ private:
     glm::vec2 m_center;
     Pair m_centerChunk;
     std::vector<std::vector<Pair>> m_chunkMap;
-
-    SimplexNoise m_noise;
 
     TerrainRenderer m_renderer;
 };
