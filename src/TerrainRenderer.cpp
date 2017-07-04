@@ -63,6 +63,7 @@ void TerrainRenderer::reset(int radius, int detail)
                  nullptr, GL_DYNAMIC_DRAW);
 
     m_shaderProgram.setAttributeFloat("position", 3, sizeof(Vertex), offsetof(Vertex, position));
+    m_shaderProgram.setAttributeFloat("normal", 3, sizeof(Vertex), offsetof(Vertex, normal));
     m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(Vertex), offsetof(Vertex, texcoords));
 
     m_shaderProgram.use();
@@ -95,9 +96,22 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
         {
             float x = coord_x + 1.0f * i / m_detail - 0.5f,
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
+
+            float left  = chunk_heights[c - (i != 0 ? 1 : 0)];
+            float right = chunk_heights[c + (i != m_detail ? 1 : 0)];
+            float up    = chunk_heights[c - (j != 0 ? m_detail : 0)];
+            float down  = chunk_heights[c + (j != m_detail ? m_detail : 0)];
+
+            glm::vec3 diff1 = {1.f / m_detail, 0.f, right - left};
+            glm::vec3 diff2 = {0.f, 1.f / m_detail, down  - up};
+            auto normal = glm::normalize(glm::cross(diff1, diff2));
+
             GLfloat height = chunk_heights[c];
-            vertices.push_back({{x, y, height},
-                               {(x + 0.5f) / texture_size_x, (y + 0.5f) / texture_size_y}});
+            vertices.push_back({
+                            {x, y, height},
+                            {normal.x, normal.y, normal.z},
+                            {(x + 0.5f) / texture_size_x, (y + 0.5f) / texture_size_y}
+            });
         }
     }
 

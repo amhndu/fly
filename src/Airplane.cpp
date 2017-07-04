@@ -43,7 +43,7 @@ void Airplane::update(float dt)
 
     if (m_elevator)
     {
-        float dAngle = (M_PI / 3.f * (std::abs(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})) * 0.9f + 0.1f)) * m_elevator * dt;
+        float dAngle = (M_PI / 2.f * (sq(m_up.z) * 0.9f + 0.1f)) * m_elevator * dt;
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngle, {0.f, 1.f, 0.f});
         m_forward = glm::normalize(m_rotationMatrix[0]);
         m_up      = glm::normalize(m_rotationMatrix[2]);
@@ -55,7 +55,7 @@ void Airplane::update(float dt)
     glm::vec3 lift    =  {0.f, 0.f, (m_up * (15.f / sq(the_velocity)) * sq(glm::dot(m_forward, m_velocity))).z};
 
     float sine = std::sqrt(1 - sq(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})));
-    if (sine > 1e-4)
+    if (sine != 0)
     {
         float radius = 4.5f / sine;
         auto centripetal = glm::normalize(glm::vec3{m_up.x, m_up.y, 0.f}) * glm::dot(m_velocity, m_velocity) / radius;

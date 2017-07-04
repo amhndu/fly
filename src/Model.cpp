@@ -37,7 +37,7 @@ Model::Model(const std::string& model_path)
         m_shaderProgram.use();
         m_shaderProgram.setAttributeFloat("position",  3, sizeof(objl::Vertex), offsetof(objl::Vertex, Position));
         m_shaderProgram.setAttributeFloat("normal",    3, sizeof(objl::Vertex), offsetof(objl::Vertex, Normal));
-        m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(objl::Vertex), offsetof(objl::Vertex, TextureCoordinate));
+        // m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(objl::Vertex), offsetof(objl::Vertex, TextureCoordinate));
         // TODO Remove texcoords (since I'm not using it)
 
         std::unordered_map<std::string, std::size_t> materials_map;
