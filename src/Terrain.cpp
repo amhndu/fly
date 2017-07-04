@@ -38,7 +38,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
             float height = 1.5f * std::pow(scaled_octave_noise_3d(4.f, 0.15f, 1.f / 6.f, 4.f, 0.f, 1.f, x, y, m_seed), 3.f);
             heights[c] = height;
             if (i >= 0 && i <= m_detail && j >= 0 && j <= m_detail)
-                color[i * (m_detail + 1) + j] = scaled_octave_noise_3d(4.f, 0.5f, 1.f / 5.f, 2.f, 0.f, 1.f, x, y, m_seed + 42);
+                color[i * (m_detail + 1) + j] = scaled_octave_noise_3d(4.f, 0.5f, 1.f / 10.f, 2.f, 0.f, 1.f, x, y, m_seed + 42);
         }
     }
 }

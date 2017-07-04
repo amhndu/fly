@@ -117,6 +117,7 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
                             {normal.x, normal.y, normal.z},
                             colormap[i * (m_detail + 1) + j]
             });
+            assert(vertices.back().color >= 0.f && vertices.back().color <= 1.f);
         }
     }
 
