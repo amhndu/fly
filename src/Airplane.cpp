@@ -8,18 +8,19 @@
 namespace fly
 {
 
-const float the_velocity = 1.5f;
 
 Airplane::Airplane() :
     m_position({0.4f, 0.0f, 1.9f}),
     m_forward({1.f, 0.f, 0.f}),
     m_up({0.f, 0.f, 1.f}),
     m_left({0.f, 1.f, 0.f}),
-    m_velocity(glm::vec3(1.f) * the_velocity),
+    m_speed(1.5f),
+    m_velocity(glm::vec3(1.f) * m_speed),
     m_translationMatrix(glm::translate(glm::mat4(1.f), m_position)),
     m_rotationMatrix(1.f),
     m_aileron(0),
     m_elevator(0),
+    m_throttle(0),
     m_model("resources/airplane.obj")
 {
     auto transform = m_translationMatrix;
@@ -33,9 +34,16 @@ void Airplane::draw()
 
 void Airplane::update(float dt)
 {
+    if (m_throttle)
+    {
+        m_speed += 0.5 * m_throttle * dt;
+        m_speed = std::min(std::max(0.f, m_speed), 3.f);
+        m_throttle = 0;
+    }
+
     if (m_aileron) // roll
     {
-        float dAngle = M_PI / 2.f * m_aileron * dt;
+        float dAngle     = M_PI / 2.f * m_aileron * dt;
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngle, {1.f, 0.f, 0.f});
         m_left = glm::normalize(m_rotationMatrix[1]);
         m_up   = glm::normalize(m_rotationMatrix[2]);
@@ -43,16 +51,16 @@ void Airplane::update(float dt)
 
     if (m_elevator)
     {
-        float dAngle = (M_PI / 3.f * (sq(m_up.z) * 0.9f + 0.1f)) * m_elevator * dt;
+        float dAngle     = (M_PI / 3.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngle, {0.f, 1.f, 0.f});
         m_forward = glm::normalize(m_rotationMatrix[0]);
         m_up      = glm::normalize(m_rotationMatrix[2]);
     }
 
-    auto thrust  =  m_forward * 35.0f;
-    auto drag    = -glm::normalize(m_velocity) * (35.0f / sq(the_velocity)) * glm::dot(m_velocity, m_velocity);
-    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 15.f;
-    glm::vec3 lift    =  {0.f, 0.f, (m_up * (15.f / sq(the_velocity)) * sq(glm::dot(m_forward, m_velocity))).z};
+    auto thrust  =  m_forward * 35.0f * m_speed / 1.5f;
+    auto drag    = -glm::normalize(m_velocity) * (35.0f / sq(1.5f)) * glm::dot(m_velocity, m_velocity);
+    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 25.f;
+    glm::vec3 lift    =  {0.f, 0.f, (m_up * (25.f / sq(1.5f)) * sq(glm::dot(m_forward, m_velocity))).z};
 
     float sine = std::sqrt(1 - sq(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})));
     if (sine >= 0.1)

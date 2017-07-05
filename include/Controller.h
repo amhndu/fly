@@ -14,10 +14,10 @@ public:
     {
         RollLeft,
         RollRight,
-        ElevatorUp,         // Technically, elevator is down but we mean the motion
+        ElevatorUp,         // Technically, elevator is down but we refer to the motion
         ElevatorDown,
-//         ThrustUp,
-//         ThrustDown,
+        ThrustUp,
+        ThrustDown,
         TotalEvents
     };
     Controller(sf::Window& window);

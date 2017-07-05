@@ -14,7 +14,7 @@ vec3 light_color = vec3( 1.0,  1.0,  1.0);
 
 void main()
 {
-    vec3 color = vec3(texture(tex, vec2(Color, 1.0 - (Height / 1.5))));
+    vec3 color = vec3(texture(tex, vec2(1.0 - (Height / 1.5), Color)));
 
     vec3 norm = normalize(Normal);
 

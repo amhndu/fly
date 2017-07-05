@@ -127,8 +127,8 @@ int main(int argc, char** argv)
     }
 
     sf::ContextSettings settings;
-    settings.depthBits = 24;
-    settings.stencilBits = 8;
+    settings.depthBits    = 24;
+    settings.stencilBits  = 8;
     settings.antialiasingLevel = 2;
     settings.majorVersion = 3;
     settings.minorVersion = 3;
@@ -163,7 +163,8 @@ int main(int argc, char** argv)
                                                    1.f * window.getSize().x / window.getSize().y,
                                                    0.05f, 50.0f);
     Terrain terrain(15, 15);
-    terrain.generate(opts.manualSeed ? opts.seed : std::rand() % 1000 + 1.f * std::rand() / RAND_MAX);
+    terrain.generate(opts.manualSeed ? opts.seed :
+                     std::rand() % 1000 + 1.f * std::rand() / RAND_MAX);
     terrain.setProjection(projection_matrix);
 
     Airplane aircraft;
@@ -180,6 +181,8 @@ int main(int argc, char** argv)
     controller.setCallback(Controller::RollRight,    std::bind(&Airplane::roll,    &aircraft, +1));
     controller.setCallback(Controller::ElevatorUp,   std::bind(&Airplane::elevate, &aircraft, -1));
     controller.setCallback(Controller::ElevatorDown, std::bind(&Airplane::elevate, &aircraft, +1));
+    controller.setCallback(Controller::ThrustUp,     std::bind(&Airplane::throttle,&aircraft, +1));
+    controller.setCallback(Controller::ThrustDown,   std::bind(&Airplane::throttle,&aircraft, -1));
 
     // GL setup
     glEnable(GL_DEPTH_TEST);
@@ -237,7 +240,7 @@ int main(int argc, char** argv)
 
             prev_time += frame_period;
         }
-        sf::sleep(sf::seconds(1.f/60.f));  // MinGW's this_thread::sleep_for doesn't work for some reason
+        sf::sleep(sf::seconds(1.f / 60.f));  // For portability, as MinGW's this_thread::sleep_for is broken
     }
 
     window.close();

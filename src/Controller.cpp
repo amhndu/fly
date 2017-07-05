@@ -10,8 +10,8 @@ Controller::Controller(sf::Window& window)  :
     m_window(window),
     m_prevMouse(sf::Mouse::getPosition(window))
 {
-    m_prevMouse = static_cast<sf::Vector2i>(m_window.getSize()) / 2;
-    sf::Mouse::setPosition(m_prevMouse, window);
+//     m_prevMouse = static_cast<sf::Vector2i>(m_window.getSize()) / 2;
+//     sf::Mouse::setPosition(m_prevMouse, window);
 }
 
 
@@ -31,10 +31,10 @@ void Controller::takeInput(float dt)
     if (isPressed(Key::D) || isPressed(Key::Right))
         m_callbacks[RollRight]();
 
-//     if (isPressed(Key::Space))
-//         m_callbacks[ThrustUp]();
-//     if (isPressed(Key::LShift))
-//         m_callbacks[ThrustDown]();
+    if (isPressed(Key::Space))
+        m_callbacks[ThrustUp]();
+    if (isPressed(Key::LShift))
+        m_callbacks[ThrustDown]();
 
 //     auto newMouse = sf::Mouse::getPosition(m_window);
 //     if (newMouse != m_prevMouse)

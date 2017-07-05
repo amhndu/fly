@@ -35,8 +35,10 @@ Model::Model(const std::string& model_path)
                      loader.LoadedIndices.data(), GL_STATIC_DRAW);
 
         m_shaderProgram.use();
-        m_shaderProgram.setAttributeFloat("position",  3, sizeof(objl::Vertex), offsetof(objl::Vertex, Position));
-        m_shaderProgram.setAttributeFloat("normal",    3, sizeof(objl::Vertex), offsetof(objl::Vertex, Normal));
+        m_shaderProgram.setAttributeFloat("position", 3, sizeof(objl::Vertex),
+                                          offsetof(objl::Vertex, Position));
+        m_shaderProgram.setAttributeFloat("normal",   3, sizeof(objl::Vertex),
+                                          offsetof(objl::Vertex, Normal));
         // m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(objl::Vertex), offsetof(objl::Vertex, TextureCoordinate));
         // TODO Remove texcoords (since I'm not using it)
 
@@ -80,10 +82,10 @@ void Model::draw()
     m_shaderProgram.use();
     for (auto& mesh : m_meshes)
     {
-        m_shaderProgram.setUniform("ambient_color", mesh.material.ambient_color);
-        m_shaderProgram.setUniform("diffuse_color", mesh.material.diffuse_color);
+        m_shaderProgram.setUniform("ambient_color",     mesh.material.ambient_color);
+        m_shaderProgram.setUniform("diffuse_color",     mesh.material.diffuse_color);
         m_shaderProgram.setUniform("specular_exponent", mesh.material.specular_exponent);
-        m_shaderProgram.setUniform("specular_color", mesh.material.specular_color);
+        m_shaderProgram.setUniform("specular_color",    mesh.material.specular_color);
         glDrawElements(GL_TRIANGLES, mesh.elements_size, GL_UNSIGNED_INT,
                        reinterpret_cast<void*>(mesh.elements_offset * sizeof(unsigned int)));
     }

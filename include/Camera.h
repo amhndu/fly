@@ -22,7 +22,7 @@ private:
     glm::vec3 m_up;
     glm::vec3 m_planeUp;
 
-    bool m_viewChanged;
+    bool      m_viewChanged;
 
     glm::mat4 m_view;
 
