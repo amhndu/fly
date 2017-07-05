@@ -1,7 +1,7 @@
 Fly
 =====
 
-Supposed to be a flight simulator... albeit not a very good one.
+A simple flight simulator
 
 Dependencies:
 
@@ -11,4 +11,9 @@ Dependencies:
 
 Should be available in your repos. Once, installed, run cmake on the project directory.
 
-(Try: WASD [or array keys] and moving the mouse. Esc to quit)
+**Controls**:
+WASD or Arrow keys to change the plane's direction
+
+**Command line arguments**:
+Launch with `-h` or `--help` to print available options and the defaults.
+

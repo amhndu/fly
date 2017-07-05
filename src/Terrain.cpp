@@ -52,6 +52,7 @@ void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y,
 
 void Terrain::generate(float seed)
 {
+    LOG(Info) << "Generating terrain with seed: " << seed << std::endl;
     m_seed = seed;
     m_renderer.reset(m_radius, m_detail);
     m_chunkMap.resize(2 * m_radius - 1, std::vector<Pair>(2 * m_radius - 1, {0, 0}));
