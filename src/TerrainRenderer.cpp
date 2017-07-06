@@ -130,8 +130,8 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
         for (int j = 0; j < m_detail; ++j)
         {
             elements.push_back(vertex_offset + (m_detail + 1) * i + j);
-            elements.push_back(vertex_offset + (m_detail + 1) * i + j + 1);
             elements.push_back(vertex_offset + (m_detail + 1) * (i + 1) + j);
+            elements.push_back(vertex_offset + (m_detail + 1) * i + j + 1);
 
             elements.push_back(vertex_offset + (m_detail + 1) * (i + 1) + j + 1);
             elements.push_back(vertex_offset + (m_detail + 1) * i + j + 1);

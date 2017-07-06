@@ -43,7 +43,7 @@ void Airplane::update(float dt)
 
     float dAngleX;
     if (m_aileron) // roll
-        dAngleX     = M_PI / 4.f * m_aileron * dt;
+        dAngleX     = M_PI / 3.f * m_aileron * dt;
     else
         dAngleX     = -sign(m_left.z) * std::sqrt(std::abs(m_left.z)) * M_PI / 8.f * dt;
     m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleX, {1.f, 0.f, 0.f});

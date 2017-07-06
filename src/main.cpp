@@ -12,15 +12,16 @@
 
 struct Options
 {
-    bool  fullscreen;
+    float seed;
     uint  windowWidth;
     uint  windowHeight;
     bool  manualSeed;
-    float seed;
+    bool  wireframe;
     bool  showHelp;
+    bool  fullscreen;
 };
 
-const Options DefaultOptions {false, 800u, 600u, false, 0.f, false};
+const Options DefaultOptions {0.f, 800u, 600u, false, false, false, false};
 
 void printHelp()
 {
@@ -33,6 +34,8 @@ void printHelp()
               << "-s Z | sZ            Set seed to Z (default: random seed)" << std::endl
               << "-f   | --fullscreen  Set fullscreen mode (default: " << std::boolalpha
                                                                      << DefaultOptions.fullscreen << ")" << std::endl
+              << "--wireframe          Render in wireframe mode (default: " << std::boolalpha
+                                                                     << DefaultOptions.wireframe << ")" << std::endl
               << std::endl;
 }
 
@@ -52,7 +55,12 @@ Options processArguments(int argc, char** argv)
         if (arg == "-f" || arg == "--fullscreen")
         {
             opts.fullscreen = true;
-            LOG(Info) << "Window set to fullscreen" << std::endl;
+            LOG(Info) << "Window set to fullscreen." << std::endl;
+        }
+        else if (arg == "--wireframe")
+        {
+            opts.wireframe = true;
+            LOG(Info) << "Rendering in wireframe mode." << std::endl;
         }
         else if (arg.substr(0, 2) == "-w")
         {
@@ -186,10 +194,11 @@ int main(int argc, char** argv)
 
     // GL setup
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
-    /* Wireframe mode
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-    //*/
+    /* Wireframe mode */
+    if (opts.wireframe)
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     auto prev_time = std::chrono::steady_clock::now();
     const std::chrono::steady_clock::duration frame_period(std::chrono::milliseconds(1000/60));

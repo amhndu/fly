@@ -14,8 +14,6 @@ static int positive_mod(int a, int b)
     return (a % b + b) % b;
 }
 
-// TODO Scale everything down by 0.5
-
 Terrain::Terrain(int radius, int detail) :
             m_radius(radius),
             m_detail(detail),
@@ -76,8 +74,6 @@ void Terrain::draw()
 
 void Terrain::moveCenter(const glm::vec2& displacement)
 {
-    // TODO Make it so that crossing a chunk boundary back and forth doesn't cause thrashing
-
     m_center += displacement;
 
     int dx_chunk = static_cast<int>(m_center.x) - m_centerChunk.x;

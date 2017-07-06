@@ -40,7 +40,7 @@ Model::Model(const std::string& model_path)
         m_shaderProgram.setAttributeFloat("normal",   3, sizeof(objl::Vertex),
                                           offsetof(objl::Vertex, Normal));
         // m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(objl::Vertex), offsetof(objl::Vertex, TextureCoordinate));
-        // TODO Remove texcoords (since I'm not using it)
+        // TODO Remove texcoords (since I'm not using it, instead of wasting precious GPU memory)
 
         std::unordered_map<std::string, std::size_t> materials_map;
 

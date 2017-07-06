@@ -122,6 +122,7 @@ bool ShaderProgram::setUniform(GLint uniform, const glm::vec3& vec)
 {
     use();
     glUniform3fv(uniform, 1, &vec[0]);
+    return ASSERT_GL_ERRORS();
 }
 
 
