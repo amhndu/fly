@@ -21,6 +21,7 @@ Airplane::Airplane() :
     m_aileron(0),
     m_elevator(0),
     m_throttle(0),
+    m_stabilizeTimer(0),
     m_model("resources/airplane.obj")
 {
     auto transform = m_translationMatrix;
@@ -41,26 +42,33 @@ void Airplane::update(float dt)
         m_throttle = 0;
     }
 
-    float dAngleX;
+    if (m_stabilizeTimer > 0)
+        m_stabilizeTimer -= dt;
+    float dAngleX = 0.f;
     if (m_aileron) // roll
         dAngleX     = M_PI / 3.f * m_aileron * dt;
-    else
+    else if (m_stabilizeTimer < 0)
         dAngleX     = -sign(m_left.z) * std::sqrt(std::abs(m_left.z)) * M_PI / 8.f * dt;
-    m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleX, {1.f, 0.f, 0.f});
+    if (dAngleX != 0.f)
+        m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleX, {1.f, 0.f, 0.f});
 
-    float dAngleY;
+    float dAngleY = 0.f;
     if (m_elevator)
-        dAngleY     = (M_PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
-    else
-        dAngleY     = m_forward.z * M_PI / 8.f * dt;
-    m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleY, {0.f, 1.f, 0.f});
+        dAngleY     = (M_PI / 3.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
+    else if (m_stabilizeTimer < 0)
+        dAngleY     = m_forward.z * M_PI / 6.f * dt;
+    if (dAngleY != 0.f)
+        m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleY, {0.f, 1.f, 0.f});
+
+    if (m_elevator || m_aileron)
+        m_stabilizeTimer = 0.3f;
 
     m_forward = glm::normalize(m_rotationMatrix[0]);
     m_left    = glm::normalize(m_rotationMatrix[1]);
     m_up      = glm::normalize(m_rotationMatrix[2]);
 
-    auto thrust  =  m_forward * 35.0f * m_speed / 1.5f;
-    auto drag    = -glm::normalize(m_velocity) * (35.0f / sq(1.5f)) * glm::dot(m_velocity, m_velocity);
+    auto thrust  =  m_forward * 25.0f * m_speed / 1.5f;
+    auto drag    = -glm::normalize(m_velocity) * (25.0f / sq(1.5f)) * glm::dot(m_velocity, m_velocity);
     glm::vec3 gravity =  glm::vec3(0, 0, -1) * 15.f;
     glm::vec3 lift    =  {0.f, 0.f, (m_up * (15.f / sq(1.5f)) * sq(glm::dot(m_forward, m_velocity))).z};
 

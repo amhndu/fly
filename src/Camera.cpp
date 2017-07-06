@@ -36,7 +36,8 @@ void Camera::updateView(float dt)
 {
     m_position    = m_airplane.getPosition();
     auto delta_direction = m_airplane.getForwardDirection() - m_direction;
-//     delta_direction.z = 0;//sign(delta_direction.z) * std::max(std::min(std::abs(delta_direction.z), 0.002f), 0.0009f);
+    delta_direction.x  = sign(delta_direction.x) * std::min(std::abs(delta_direction.x), 0.008f);
+    delta_direction.y  = sign(delta_direction.y) * std::min(std::abs(delta_direction.y), 0.008f);
     m_direction += delta_direction;
     m_planeUp     = m_airplane.getUpDirection();
     m_viewChanged = true;

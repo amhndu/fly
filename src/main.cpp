@@ -220,8 +220,7 @@ int main(int argc, char** argv)
             }
             else if (event.type == sf::Event::LostFocus)
                 focus = false;
-            /*else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::G)
-                terrain.generate(rand() / 65536.f);*/
+
         }
 
         auto now = std::chrono::steady_clock::now();

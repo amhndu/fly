@@ -52,9 +52,9 @@ void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y,
 
 void Terrain::generate(float seed)
 {
-    LOG(Info) << "Generating terrain with seed: " << seed << std::endl;
     m_seed = seed;
     m_renderer.reset(m_radius, m_detail);
+    LOG(Info) << "Generating terrain with seed: " << seed << std::endl;
     m_chunkMap.resize(2 * m_radius - 1, std::vector<Pair>(2 * m_radius - 1, {0, 0}));
     std::vector<float> heights, colormap;
     for (int x = -m_radius + 1; x < m_radius; ++x)
@@ -65,6 +65,7 @@ void Terrain::generate(float seed)
             updateChunk(x, y, x, y, heights, colormap);
         }
     }
+    LOG(Info) << "Generated terrain." << std::endl;
 }
 
 void Terrain::draw()

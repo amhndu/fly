@@ -66,6 +66,7 @@ Model::Model(const std::string& model_path)
     else
         LOG(Error) << "Error in opening model file: " << model_path << std::endl;
 
+    LOG(Info) << "Loaded model: " << model_path << std::endl;
     m_vao.unbind();
     ASSERT_GL_ERRORS();
 }

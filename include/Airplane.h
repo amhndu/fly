@@ -33,6 +33,7 @@ private:
     char      m_aileron;
     char      m_elevator;
     char      m_throttle;
+    float     m_stabilizeTimer;
     Model     m_model;
 };
 
