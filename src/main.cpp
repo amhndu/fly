@@ -9,6 +9,7 @@
 #include "Controller.h"
 #include "Airplane.h"
 #include "Utility.h"
+#include "Sky.h"
 
 struct Options
 {
@@ -164,7 +165,8 @@ int main(int argc, char** argv)
     glewExperimental = GL_TRUE;
     glewInit();
 
-    TextureManager::uploadFile("resources/texture.png");
+    TextureManager::uploadFile("terrain_lookup", ".png");
+    TextureManager::uploadFile("miramar/miramar", ".png", TextureManager::TextureCube);
 
     // The default projection matrix
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
@@ -177,6 +179,9 @@ int main(int argc, char** argv)
 
     Airplane aircraft;
     aircraft.setProjection(projection_matrix);
+
+    Sky sky;
+    sky.setProjection(projection_matrix);
 
     Camera camera(aircraft.getPosition(),                // Start position
                   aircraft.getForwardDirection(),       // Direction
@@ -191,6 +196,7 @@ int main(int argc, char** argv)
     controller.setCallback(Controller::ElevatorDown, std::bind(&Airplane::elevate, &aircraft, +1));
     controller.setCallback(Controller::ThrustUp,     std::bind(&Airplane::throttle,&aircraft, +1));
     controller.setCallback(Controller::ThrustDown,   std::bind(&Airplane::throttle,&aircraft, -1));
+    // controller.registerRotate([&](float x, float y){ camera.rotate(x, y); });
 
     // GL setup
     glEnable(GL_DEPTH_TEST);
@@ -232,17 +238,19 @@ int main(int argc, char** argv)
             terrain.setCenter(aircraft.getPosition());
             camera.updateView(frame_period_seconds);
 
-            glClearColor(100.f / 255.f, 250.f / 255.f, 255.f / 255.f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // glClearColor(100.f / 255.f, 250.f / 255.f, 255.f / 255.f, 1.0f);
+            glClear(/*GL_COLOR_BUFFER_BIT | */GL_DEPTH_BUFFER_BIT);
 
             if (camera.viewChanged())
             {
                 glm::mat4 view = camera.getView();
                 terrain.setView(view);
                 aircraft.setView(view);
+                sky.setView(view);
             }
             terrain.draw();
             aircraft.draw();
+            sky.draw();
 
             window.display();
 

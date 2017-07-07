@@ -68,7 +68,7 @@ void TerrainRenderer::reset(int radius, int detail)
 
     m_shaderProgram.use();
 
-    m_shaderProgram.setUniform("tex"  , TextureManager::getSampler("resources/texture.png"));
+    m_shaderProgram.setUniform("tex"  , TextureManager::getSampler("terrain_lookup"));
     m_shaderProgram.setUniform("model", glm::mat4(1.f));
 
     ASSERT_GL_ERRORS();
@@ -85,7 +85,6 @@ void TerrainRenderer::draw()
 
 void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
                                   int coord_x, int coord_y,
-                                  float texture_size_x, float texture_size_y,
                                   const std::vector<float>& chunk_heights,
                                   const std::vector<float>& colormap)
 {

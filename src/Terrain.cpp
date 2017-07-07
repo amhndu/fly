@@ -47,7 +47,7 @@ void Terrain::updateChunk(int chunk_x, int chunk_y, int coord_x, int coord_y,
                           const std::vector<float>& heights, const std::vector<float>& color)
 {
     m_chunkMap[chunk_x + m_radius - 1][chunk_y + m_radius - 1] = {coord_x, coord_y};
-    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, 2.50f, 2.50f, heights, color);
+    m_renderer.updateChunk(chunk_x, chunk_y, coord_x, coord_y, heights, color);
 }
 
 void Terrain::generate(float seed)

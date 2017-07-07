@@ -14,6 +14,7 @@ public:
     Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, Airplane& airplane);
     bool viewChanged() const { return m_viewChanged; }
     void updateView(float dt);
+    void rotate(float x, float y);
     glm::mat4 getView();
 
 private:

@@ -26,12 +26,13 @@ void main()
     float diffuse_strength = 0.8;
     vec3 diffuse = diffuse_strength * max(dot(norm, LightDirection), 0.0) * light_color * color;
 
-    vec3 final_color = ambient + diffuse;
-
     float alpha = 1.0;
     float distance = length(FragPosition);
-    if (distance >= 13.0)
-        alpha = 1.0 / (distance - 12.0);
+    if (distance >= 11.0)
+        alpha = 1.0 / (distance - 10.0);
 
-    outColor = vec4(mix(vec3(0.39, 0.98, 1.0), final_color, alpha), 1.0);
+    vec3 perspective_color = vec3(155.0 / 255.0); //vec3(79.0 / 255, 87.0 / 255, 104.0 / 255);
+
+    vec3 final_color = mix(perspective_color, ambient + diffuse, alpha);
+    outColor = vec4(final_color, 1.0);
 }

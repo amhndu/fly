@@ -7,7 +7,7 @@
 namespace fly
 {
 
-bool TextureManager::priv_uploadFile(const std::string& path)
+bool TextureManager::priv_uploadFile(const std::string& name, const std::string& filetype)
 {
     if (m_counter >= GL_MAX_TEXTURE_UNITS)
     {
@@ -17,10 +17,10 @@ bool TextureManager::priv_uploadFile(const std::string& path)
 
     GLuint texture;
     glGenTextures(1, &texture);
-    sf::Image image;
     glActiveTexture(GL_TEXTURE0 + m_counter);
     glBindTexture(GL_TEXTURE_2D, texture);
-    if (!image.loadFromFile(path))
+    sf::Image image;
+    if (!image.loadFromFile("resources/" + name + filetype))
     {
         LOG(Error) << "Couldn't load texture file" << std::endl;
         return false;
@@ -36,13 +36,53 @@ bool TextureManager::priv_uploadFile(const std::string& path)
     if ((res = ASSERT_GL_ERRORS()) == true)
     {
         m_textures.push_back(texture);
-        m_samplerMap.emplace(path, m_counter++);
+        m_samplerMap.emplace(name, m_counter++);
     }
     else
         glDeleteTextures(1, &texture);
 
     return res;
 }
+
+bool TextureManager::priv_uploadCube(const std::string& name, const std::string& filetype)
+{
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+
+    int target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+    for (const std::string& suffix : {"rt", "lf", "up", "dn", "bk", "ft"})
+    {
+        sf::Image image;
+        if (!image.loadFromFile("resources/" + name + "_" + suffix + filetype))
+        {
+            LOG(Error) << "Failed to open texture for sky box: " << name + "_" + suffix << std::endl;
+            return false;
+        }
+
+        glTexImage2D(target, 0, GL_RGB, image.getSize().x, image.getSize().y, 0, GL_RGBA,
+                        GL_UNSIGNED_BYTE, image.getPixelsPtr());
+        ++target;
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    bool res;
+    if ((res = ASSERT_GL_ERRORS()) == true)
+    {
+        m_textures.push_back(texture);
+        m_samplerMap.emplace(name, m_counter++);
+    }
+    else
+        glDeleteTextures(1, &texture);
+
+    return res;
+}
+
 
 TextureManager::~TextureManager()
 {

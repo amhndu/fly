@@ -31,6 +31,25 @@ glm::mat4 Camera::getView()
     return m_view;
 }
 
+void Camera::rotate(float x, float y)
+{
+    const float multiplier = M_PI / 6.f;
+    if (y)
+    {
+        y = -y;
+        float theta = multiplier * y;
+        auto prev_dir = m_direction, prev_up = m_up;
+        m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * prev_up);
+    }
+    if (x)
+    {
+        float theta = multiplier * x;
+        auto prev_dir = m_direction;
+        auto cross  = glm::normalize(glm::cross(m_direction, m_up));
+        m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * cross);
+    }
+    m_viewChanged = true;
+}
 
 void Camera::updateView(float dt)
 {
