@@ -28,10 +28,11 @@ void main()
 
     float alpha = 1.0;
     float distance = length(FragPosition);
-    if (distance >= 11.0)
-        alpha = 1.0 / (distance - 10.0);
+    const float fog_begin = 7.0;
+    if (distance >= fog_begin)
+        alpha = exp((fog_begin - distance) / 8.0);
 
-    vec3 perspective_color = vec3(155.0 / 255.0); //vec3(79.0 / 255, 87.0 / 255, 104.0 / 255);
+    vec3 perspective_color = /*vec3(0.7431, 0.79607, 0.69019);*/ vec3(149 / 255.0, 187 / 255.0, 187 / 255.0);
 
     vec3 final_color = mix(perspective_color, ambient + diffuse, alpha);
     outColor = vec4(final_color, 1.0);

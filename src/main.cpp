@@ -166,7 +166,7 @@ int main(int argc, char** argv)
     glewInit();
 
     TextureManager::uploadFile("terrain_lookup", ".png");
-    TextureManager::uploadFile("miramar/miramar", ".png", TextureManager::TextureCube);
+    TextureManager::uploadFile("TropicalSunnyDay/TropicalSunnyDay", ".png", TextureManager::TextureCube);
 
     // The default projection matrix
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
