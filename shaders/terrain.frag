@@ -32,7 +32,7 @@ void main()
     if (distance >= fog_begin)
         alpha = exp((fog_begin - distance) / 8.0);
 
-    vec3 perspective_color = /*vec3(0.7431, 0.79607, 0.69019);*/ vec3(149 / 255.0, 187 / 255.0, 187 / 255.0);
+    vec3 perspective_color = vec3(151 / 255.0, 208 / 255.0, 212 / 255.0);
 
     vec3 final_color = mix(perspective_color, ambient + diffuse, alpha);
     outColor = vec4(final_color, 1.0);

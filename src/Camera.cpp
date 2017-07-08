@@ -23,7 +23,7 @@ glm::mat4 Camera::getView()
     {
         m_view = glm::lookAt(m_position -
             glm::normalize(glm::vec3{m_direction.x, m_direction.y, 0.f}) * 0.2f
-                         + glm::vec3{0.f, 0.f, 1.f} * 0.08f,  // eye
+                         + glm::vec3{0.f, 0.f, 1.f} * 0.06f,  // eye
             m_position,  // center
             m_up);
         m_viewChanged = false;
@@ -55,8 +55,6 @@ void Camera::updateView(float dt)
 {
     m_position    = m_airplane.getPosition();
     auto delta_direction = m_airplane.getForwardDirection() - m_direction;
-    delta_direction.x  = sign(delta_direction.x) * std::min(std::abs(delta_direction.x), 0.008f);
-    delta_direction.y  = sign(delta_direction.y) * std::min(std::abs(delta_direction.y), 0.008f);
     m_direction += delta_direction;
     m_planeUp     = m_airplane.getUpDirection();
     m_viewChanged = true;

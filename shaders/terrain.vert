@@ -10,7 +10,7 @@ out vec3  FragPosition;
 out float Height;
 out float Color;
 
-vec3 light_direction = normalize(vec3(0.2, 0.3, 1.0));
+vec3 light_direction = normalize(vec3(0.3, 0.3, 0.9));
 
 uniform mat4 model;
 uniform mat4 view;

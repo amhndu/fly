@@ -238,8 +238,7 @@ int main(int argc, char** argv)
             terrain.setCenter(aircraft.getPosition());
             camera.updateView(frame_period_seconds);
 
-            // glClearColor(100.f / 255.f, 250.f / 255.f, 255.f / 255.f, 1.0f);
-            glClear(/*GL_COLOR_BUFFER_BIT | */GL_DEPTH_BUFFER_BIT);
+            glClear(GL_DEPTH_BUFFER_BIT);
 
             if (camera.viewChanged())
             {
@@ -248,15 +247,16 @@ int main(int argc, char** argv)
                 aircraft.setView(view);
                 sky.setView(view);
             }
-            terrain.draw();
+
             aircraft.draw();
+            terrain.draw();
             sky.draw();
 
             window.display();
 
             prev_time += frame_period;
         }
-        sf::sleep(sf::seconds(1.f / 60.f));  // For portability, as MinGW's this_thread::sleep_for is broken
+        sf::sleep(sf::seconds(frame_period_seconds));  // For portability, as MinGW's this_thread::sleep_for is broken
     }
 
     window.close();
