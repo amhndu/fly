@@ -18,11 +18,13 @@ public:
     ~TextureManager();
     static bool uploadFile(const std::string& name, const std::string& filetype, bool cube = false)
     { return cube ? get().priv_uploadCube(name, filetype) : get().priv_uploadFile(name, filetype); }
-    static int  getSampler(const std::string& path) { return get().priv_getSampler(path); }
+    static int  getSampler(const std::string& name) { return get().priv_getSampler(name); }
+    static uint generateTexture(const std::string& name) { return get().priv_generateTexture(name); }
 private:
     bool priv_uploadFile(const std::string& name, const std::string& filetype);
     bool priv_uploadCube(const std::string& name, const std::string& filetype);
     int  priv_getSampler(const std::string& name) { return m_samplerMap.at(name); }
+    uint priv_generateTexture(const std::string& name);
     static TextureManager& get();
     unsigned int m_counter;
     std::vector<GLuint> m_textures;

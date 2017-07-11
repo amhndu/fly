@@ -10,7 +10,7 @@ namespace fly
 
 
 Airplane::Airplane() :
-    m_position({0.4f, 0.0f, 1.9f}),
+    m_position({0.0f, 0.0f, 1.2f}),
     m_forward({1.f, 0.f, 0.f}),
     m_up({0.f, 0.f, 1.f}),
     m_left({0.f, 1.f, 0.f}),
@@ -21,17 +21,12 @@ Airplane::Airplane() :
     m_aileron(0),
     m_elevator(0),
     m_throttle(0),
-    m_stabilizeTimer(0),
     m_model("resources/airplane.obj")
 {
     auto transform = m_translationMatrix;
     m_model.setTransform(transform);
 }
 
-void Airplane::draw()
-{
-    m_model.draw();
-}
 
 void Airplane::update(float dt)
 {
@@ -42,12 +37,11 @@ void Airplane::update(float dt)
         m_throttle = 0;
     }
 
-    if (m_stabilizeTimer > 0)
-        m_stabilizeTimer -= dt;
+
     float dAngleX = 0.f;
     if (m_aileron) // roll
         dAngleX     = M_PI / 3.f * m_aileron * dt;
-    else if (m_stabilizeTimer < 0)
+    else
         dAngleX     = -sign(m_left.z) * std::sqrt(std::abs(m_left.z)) * M_PI / 8.f * dt;
     if (dAngleX != 0.f)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleX, {1.f, 0.f, 0.f});
@@ -55,13 +49,10 @@ void Airplane::update(float dt)
     float dAngleY = 0.f;
     if (m_elevator)
         dAngleY     = (M_PI / 3.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
-    else if (m_stabilizeTimer < 0)
-        dAngleY     = m_forward.z * M_PI / 6.f * dt;
+    else
+        dAngleY     = m_forward.z * M_PI / 4.f * dt;
     if (dAngleY != 0.f)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleY, {0.f, 1.f, 0.f});
-
-    if (m_elevator || m_aileron)
-        m_stabilizeTimer = 0.3f;
 
     m_forward = glm::normalize(m_rotationMatrix[0]);
     m_left    = glm::normalize(m_rotationMatrix[1]);

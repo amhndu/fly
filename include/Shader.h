@@ -25,6 +25,7 @@ public:
     ShaderProgram& operator= (const ShaderProgram& other) = delete;
 
     bool loadShaderFile(const std::string& path, Shader type);
+    bool loadShaderString(const std::string& shader_src, Shader type);
     void use();
 
     bool setAttributeFloat(const std::string& name, GLsizei size,

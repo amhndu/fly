@@ -1,6 +1,6 @@
-#version 150
+#version 330 core
 
-in vec3 position;
+layout (location = 0) in vec3 position;
 in vec3 normal;
 // in vec2 texcoords;
 
@@ -12,7 +12,7 @@ out vec3 Normal;
 out vec3 FragPosition;
 out vec3 LightDirection;
 
-vec3 light_direction = normalize(vec3(0.2, 0.3, 1.0));
+vec3 light_direction = normalize(vec3(0.3, 0.3, 0.9));
 
 void main()
 {

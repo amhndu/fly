@@ -34,7 +34,6 @@ Model::Model(const std::string& model_path)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, loader.LoadedIndices.size() * sizeof(unsigned int),
                      loader.LoadedIndices.data(), GL_STATIC_DRAW);
 
-        m_shaderProgram.use();
         m_shaderProgram.setAttributeFloat("position", 3, sizeof(objl::Vertex),
                                           offsetof(objl::Vertex, Position));
         m_shaderProgram.setAttributeFloat("normal",   3, sizeof(objl::Vertex),
@@ -62,11 +61,14 @@ Model::Model(const std::string& model_path)
                                 m_materials.at(materials_map[mesh.MeshMaterial.name])});
             offset += mesh.Indices.size();
         }
+        m_totalElements = loader.LoadedIndices.size();
+        assert(offset == m_totalElements);
+
+        LOG(Info) << "Loaded model: " << model_path << std::endl;
     }
     else
         LOG(Error) << "Error in opening model file: " << model_path << std::endl;
 
-    LOG(Info) << "Loaded model: " << model_path << std::endl;
     m_vao.unbind();
     ASSERT_GL_ERRORS();
 }
@@ -79,8 +81,8 @@ Model::~Model()
 
 void Model::draw()
 {
-    m_vao.bind();
     m_shaderProgram.use();
+    m_vao.bind();
     for (auto& mesh : m_meshes)
     {
         m_shaderProgram.setUniform("ambient_color",     mesh.material.ambient_color);
@@ -90,6 +92,13 @@ void Model::draw()
         glDrawElements(GL_TRIANGLES, mesh.elements_size, GL_UNSIGNED_INT,
                        reinterpret_cast<void*>(mesh.elements_offset * sizeof(unsigned int)));
     }
+    m_vao.unbind();
+}
+
+void Model::rawDraw()
+{
+    m_vao.bind();
+    glDrawElements(GL_TRIANGLES, m_totalElements, GL_UNSIGNED_INT, 0);
     m_vao.unbind();
 }
 

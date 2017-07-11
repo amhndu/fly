@@ -47,7 +47,19 @@ bool ShaderProgram::loadShaderFile(const std::string& path, Shader type)
         return false;
     }
 
-    std::string contents{std::istreambuf_iterator<char>{file}, {}};
+    std::string shader_src{std::istreambuf_iterator<char>{file}, {}};
+
+    return loadShaderString(shader_src, type);
+}
+
+bool ShaderProgram::loadShaderString(const std::string& shader_src, Shader type)
+{
+    GLint& shader = type == Shader::Vertex ? m_vertexShader : m_fragmentShader;
+    if (shader != 0)
+    {
+        LOG(Error) << "Shader already loaded." << std::endl;
+        return false;
+    }
 
     shader = glCreateShader(type == Shader::Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
     if (shader == 0)
@@ -56,7 +68,7 @@ bool ShaderProgram::loadShaderFile(const std::string& path, Shader type)
         return false;
     }
 
-    const char* ptr = contents.c_str();
+    const char* ptr = shader_src.c_str();
     glShaderSource(shader, 1, &ptr, nullptr);
     glCompileShader(shader);
     GLint compile_status;
@@ -65,8 +77,9 @@ bool ShaderProgram::loadShaderFile(const std::string& path, Shader type)
     glGetShaderInfoLog(shader, 512, NULL, buffer);
     if (compile_status != GL_TRUE)
     {
-        LOG(Error) << "Shader compilation failed." << std::endl;
+        LOG(Error) << (type == Shader::Vertex ? "Vertex" : "Fragment") << " shader compilation failed." << std::endl;
         LOG(Error) << "Compiler log:\n" << buffer << std::endl;
+        return false;
     }
     else if (std::strlen(buffer) > 0)
     {

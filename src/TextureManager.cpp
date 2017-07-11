@@ -83,6 +83,16 @@ bool TextureManager::priv_uploadCube(const std::string& name, const std::string&
     return res;
 }
 
+uint TextureManager::priv_generateTexture(const std::string& name)
+{
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glActiveTexture(GL_TEXTURE0 + m_counter);
+    m_textures.push_back(texture);
+    m_samplerMap.emplace(name, m_counter++);
+    return texture;
+}
+
 
 TextureManager::~TextureManager()
 {

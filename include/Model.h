@@ -5,12 +5,13 @@
 #include <string>
 #include "Shader.h"
 #include "VertexArrayObject.h"
+#include "Drawable.h"
 
 namespace fly
 {
 
 
-class Model
+class Model : public Drawable
 {
 public:
     Model(const std::string& model_path);
@@ -18,7 +19,8 @@ public:
     void setView(const glm::mat4& view)       { m_shaderProgram.setUniform("view", view); }
     void setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }
     void setTransform(const glm::mat4& trans) { m_shaderProgram.setUniform("model", trans); }
-    void draw();
+    void draw() override;
+    void rawDraw() override;
 private:
     ShaderProgram m_shaderProgram;
 
@@ -40,6 +42,8 @@ private:
 
     std::vector<Material> m_materials;
     std::vector<Mesh>     m_meshes;
+
+    uint m_totalElements;
 
     VertexArrayObject m_vao;
     GLuint m_vertexBuffer;

@@ -35,6 +35,7 @@ void Terrain::generateChunk(int coord_x, int coord_y, std::vector<float>& height
                   y = coord_y + 1.0f * j / m_detail - 0.5f;
             float height = 1.5f * std::pow(
                 scaled_octave_noise_3d(4.f, 0.15f, 1.f / 6.f, 4.f, 0.f, 1.f, x, y, m_seed), 3.f);
+//             height = 0.2;
             heights[c] = height;
             if (i >= 0 && i <= m_detail && j >= 0 && j <= m_detail)
                 color[i * (m_detail + 1) + j] =
@@ -68,10 +69,6 @@ void Terrain::generate(float seed)
     LOG(Info) << "Generated terrain." << std::endl;
 }
 
-void Terrain::draw()
-{
-    m_renderer.draw();
-}
 
 void Terrain::moveCenter(const glm::vec2& displacement)
 {

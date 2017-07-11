@@ -76,10 +76,15 @@ Sky::Sky()
 void Sky::draw()
 {
     m_shaderProgram.use();
+    rawDraw();
+}
+
+void Sky::rawDraw()
+{
     m_vao.bind();
     glDepthFunc(GL_LEQUAL);
     glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
-    glDepthFunc(GL_LESS);
+    glDepthFunc(GL_LESS);   // Making the assumption that GL_LESS was the previous config
 }
 
 Sky::~Sky()

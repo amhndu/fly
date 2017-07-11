@@ -10,6 +10,7 @@
 #include "Airplane.h"
 #include "Utility.h"
 #include "Sky.h"
+#include "ShadowMap.h"
 
 struct Options
 {
@@ -173,15 +174,19 @@ int main(int argc, char** argv)
                                                    1.f * window.getSize().x / window.getSize().y,
                                                    0.05f, 50.0f);
     Terrain terrain(15, 15);
-    terrain.generate(opts.manualSeed ? opts.seed :
-                     std::rand() % 1000 + 1.f * std::rand() / RAND_MAX);
-    terrain.setProjection(projection_matrix);
 
     Airplane aircraft;
     aircraft.setProjection(projection_matrix);
 
+    ShadowMap shadowMap(aircraft, terrain);
+
+    terrain.generate(opts.manualSeed ? opts.seed :
+                     std::rand() % 1000 + 1.f * std::rand() / RAND_MAX);
+    terrain.setProjection(projection_matrix);
+
     Sky sky;
     sky.setProjection(projection_matrix);
+
 
     Camera camera(aircraft.getPosition(),                // Start position
                   aircraft.getForwardDirection(),       // Direction
@@ -196,11 +201,11 @@ int main(int argc, char** argv)
     controller.setCallback(Controller::ElevatorDown, std::bind(&Airplane::elevate, &aircraft, +1));
     controller.setCallback(Controller::ThrustUp,     std::bind(&Airplane::throttle,&aircraft, +1));
     controller.setCallback(Controller::ThrustDown,   std::bind(&Airplane::throttle,&aircraft, -1));
-    // controller.registerRotate([&](float x, float y){ camera.rotate(x, y); });
+    controller.registerRotate([&](float x, float y){ camera.rotate(x, y); });
 
     // GL setup
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+//     glEnable(GL_CULL_FACE);
 
     /* Wireframe mode */
     if (opts.wireframe)
@@ -232,13 +237,13 @@ int main(int argc, char** argv)
         auto now = std::chrono::steady_clock::now();
         while (focus && now - prev_time > frame_period)
         {
+            // Render frame
+
             controller.takeInput(frame_period_seconds);
 
             aircraft.update(frame_period_seconds);
             terrain.setCenter(aircraft.getPosition());
             camera.updateView(frame_period_seconds);
-
-            glClear(GL_DEPTH_BUFFER_BIT);
 
             if (camera.viewChanged())
             {
@@ -248,6 +253,10 @@ int main(int argc, char** argv)
                 sky.setView(view);
             }
 
+            auto&& light_space = shadowMap.update();
+            terrain.setLightSpace(light_space);
+
+            glClear(GL_DEPTH_BUFFER_BIT);
             aircraft.draw();
             terrain.draw();
             sky.draw();
@@ -256,7 +265,7 @@ int main(int argc, char** argv)
 
             prev_time += frame_period;
         }
-        sf::sleep(sf::seconds(frame_period_seconds));  // For portability, as MinGW's this_thread::sleep_for is broken
+        sf::sleep(sf::seconds(1.f / 60.f));  // For portability, as MinGW's this_thread::sleep_for is broken
     }
 
     window.close();

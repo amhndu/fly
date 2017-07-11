@@ -2,16 +2,18 @@
 #define SKY_H
 #include "VertexArrayObject.h"
 #include "Shader.h"
+#include "Drawable.h"
 
 namespace fly
 {
 
-class Sky
+class Sky : public Drawable
 {
 public:
     Sky();
     ~Sky();
-    void draw();
+    void draw() override;
+    void rawDraw() override;
     void setView(const glm::mat4& view)
     { m_shaderProgram.setUniform("view", glm::mat4(glm::mat3(view))); } // Remove translation
     void setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }
