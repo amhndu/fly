@@ -23,7 +23,7 @@ struct Options
     bool  fullscreen;
 };
 
-const Options DefaultOptions {0.f, 800u, 600u, false, false, false, false};
+const Options DefaultOptions {0.f, 1024u, 720u, false, false, false, false};
 
 void printHelp()
 {
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 
     // GL setup
     glEnable(GL_DEPTH_TEST);
-//     glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     /* Wireframe mode */
     if (opts.wireframe)
