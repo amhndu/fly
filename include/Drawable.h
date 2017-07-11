@@ -5,6 +5,10 @@
 namespace fly
 {
 
+// I made this class primarily to be used in ShadowMap but it turns out,
+// only doing it with the Airplane is sufficient.
+// This interface still exists because.. I don't to throw away the effort
+
 class Drawable
 {
 public:

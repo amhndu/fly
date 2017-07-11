@@ -58,10 +58,10 @@ void Airplane::update(float dt)
     m_left    = glm::normalize(m_rotationMatrix[1]);
     m_up      = glm::normalize(m_rotationMatrix[2]);
 
-    auto thrust  =  m_forward * 25.0f * m_speed / 1.5f;
-    auto drag    = -glm::normalize(m_velocity) * (25.0f / sq(1.5f)) * glm::dot(m_velocity, m_velocity);
-    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 15.f;
-    glm::vec3 lift    =  {0.f, 0.f, (m_up * (15.f / sq(1.5f)) * sq(glm::dot(m_forward, m_velocity))).z};
+    auto thrust  =  m_forward * 15.0f * m_speed / 1.5f;
+    auto drag    = -glm::normalize(m_velocity) * (15.0f / sq(1.5f)) * glm::dot(m_velocity, m_velocity);
+    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 10.f;
+    glm::vec3 lift    =  {0.f, 0.f, (m_up * (10.f / sq(1.5f)) * sq(glm::dot(m_forward, m_velocity))).z};
 
     float sine = std::sqrt(1 - sq(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})));
     if (sine >= 0.1)

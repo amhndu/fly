@@ -11,7 +11,7 @@ out vec4  FragPosLightSpace;
 out float Height;
 out float Color;
 
-vec3 light_direction = normalize(vec3(0.3, 0.3, 0.9));
+vec3 light_direction = normalize(vec3(-0.6, 0.3, 0.9));
 
 uniform mat4 view;
 uniform mat4 proj;

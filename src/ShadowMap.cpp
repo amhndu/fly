@@ -7,9 +7,8 @@
 namespace fly
 {
 
-ShadowMap::ShadowMap(Airplane& plane, Terrain& terrain) :
+ShadowMap::ShadowMap(Airplane& plane) :
     m_airplane(plane),
-    m_terrain(terrain),
     m_projection(glm::ortho(-0.5f, 0.5f, -0.5f, 0.5f, 0.1f, 50.f))
 {
     if (m_shaderProgram.loadShaderFile("shaders/shadow.vert", Shader::Vertex))
@@ -54,7 +53,7 @@ ShadowMap::~ShadowMap()
 const glm::mat4 ShadowMap::update()
 {
     auto&& displacement = m_airplane.getPosition();
-    glm::mat4 light_view = glm::lookAt(glm::vec3{0.3f * 2 + displacement.x, 0.3f * 2 + displacement.y, 0.9f * 2},
+    glm::mat4 light_view = glm::lookAt(glm::vec3{-0.6f * 4 + displacement.x, 0.3f * 4 + displacement.y, 0.9f * 4},
                                        glm::vec3{0.f + displacement.x, 0.f + displacement.y, 0.f},
                                        glm::vec3{0.0f, 0.0f, 1.0f});
     auto light_space = m_projection * light_view;
@@ -66,17 +65,13 @@ const glm::mat4 ShadowMap::update()
     glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 
     glClear(GL_DEPTH_BUFFER_BIT);
+    glCullFace(GL_FRONT);
     // The position attribute assumed to be located at 0
-
-    m_shaderProgram.setUniform("lightSpace", light_space);
-    m_shaderProgram.setUniform("model", m_terrain.getModel());
-    m_terrain.rawDraw();
-
     m_shaderProgram.setUniform("lightSpace", light_space);
     m_shaderProgram.setUniform("model", m_airplane.getModel());
     m_airplane.rawDraw();
-//     m_airplane.draw();
 
+    glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(viewport_save[0], viewport_save[1], viewport_save[2], viewport_save[3]);
 

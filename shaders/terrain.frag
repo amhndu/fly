@@ -14,6 +14,9 @@ uniform sampler2D ShadowMap;
 
 float underShadow()
 {
+    if (length(FragPosition) > 3.f)
+        return 1.f;
+
     // perform perspective divide
     // redundant because we use orthographic projection to create the depth map
     vec3 projCoords = FragPosLightSpace.xyz / FragPosLightSpace.w;
@@ -22,7 +25,7 @@ float underShadow()
         return 1.0;
     float closestDepth = texture(ShadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z;
-    float bias = max(0.005 * (1.0 - dot(Normal, LightDirection)), 0.0005); //0.0005;
+    float bias = max(0.005 * (1.0 - dot(Normal, LightDirection)), 0.00005); //0.0005;
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);

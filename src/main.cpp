@@ -178,7 +178,7 @@ int main(int argc, char** argv)
     Airplane aircraft;
     aircraft.setProjection(projection_matrix);
 
-    ShadowMap shadowMap(aircraft, terrain);
+    ShadowMap shadowMap(aircraft);
 
     terrain.generate(opts.manualSeed ? opts.seed :
                      std::rand() % 1000 + 1.f * std::rand() / RAND_MAX);
