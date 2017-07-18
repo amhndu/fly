@@ -9,7 +9,7 @@ namespace fly
 
 ShadowMap::ShadowMap(Airplane& plane) :
     m_airplane(plane),
-    m_projection(glm::ortho(-0.5f, 0.5f, -0.5f, 0.5f, 0.1f, 50.f))
+    m_projection(glm::ortho(-0.6f, 0.6f, -0.6f, 0.6f, 0.1f, 100.f))
 {
     if (m_shaderProgram.loadShaderFile("shaders/shadow.vert", Shader::Vertex))
     {
@@ -52,9 +52,9 @@ ShadowMap::~ShadowMap()
 
 const glm::mat4 ShadowMap::update()
 {
-    auto&& displacement = m_airplane.getPosition();
-    glm::mat4 light_view = glm::lookAt(glm::vec3{-0.6f * 4 + displacement.x, 0.3f * 4 + displacement.y, 0.9f * 4},
-                                       glm::vec3{0.f + displacement.x, 0.f + displacement.y, 0.f},
+    auto&& displacement = glm::vec3{m_airplane.getPosition().x, m_airplane.getPosition().y, 0.f};
+    glm::mat4 light_view = glm::lookAt(displacement + 2.5f * glm::normalize(glm::vec3{-6.f, 3.f, 9.f}),
+                                       displacement,
                                        glm::vec3{0.0f, 0.0f, 1.0f});
     auto light_space = m_projection * light_view;
     m_shaderProgram.use();

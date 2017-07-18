@@ -22,9 +22,10 @@ private:
     glm::vec3 m_direction;
     glm::vec3 m_up;
     glm::vec3 m_planeUp;
+    float m_timer;
+    bool  m_stationary;
 
     bool      m_viewChanged;
-
     glm::mat4 m_view;
 
     Airplane& m_airplane;

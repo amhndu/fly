@@ -48,7 +48,7 @@ void Airplane::update(float dt)
 
     float dAngleY = 0.f;
     if (m_elevator)
-        dAngleY     = (M_PI / 5.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
+        dAngleY     = (M_PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
     else
         dAngleY     = sign(m_up.z) * sign(m_forward.z) * std::sqrt(std::abs(m_forward.z)) * M_PI / 4.f * dt;
     if (dAngleY != 0.f)
@@ -60,8 +60,8 @@ void Airplane::update(float dt)
 
     auto thrust  =  m_forward * 15.0f * m_speed / 1.0f;
     auto drag    = -glm::normalize(m_velocity) * (15.0f / sq(1.0f)) * glm::dot(m_velocity, m_velocity);
-    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 8.f;
-    glm::vec3 lift    =  {0.f, 0.f, (m_up * (8.f / sq(1.0f)) * sq(glm::dot(m_forward, m_velocity))).z};
+    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 6.f;
+    glm::vec3 lift    =  {0.f, 0.f, (m_up * (6.f / sq(1.0f)) * sq(glm::dot(m_forward, m_velocity))).z};
 
     float sine = std::sqrt(1 - sq(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})));
     if (sine >= 0.1)

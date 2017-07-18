@@ -158,6 +158,7 @@ int main(int argc, char** argv)
     {
         LOG(Error) << "Incapable OpenGL context" << std::endl;
     }
+
     if (opts.fullscreen)
         window.setMouseCursorVisible(false);
 
