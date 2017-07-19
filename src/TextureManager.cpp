@@ -7,9 +7,26 @@
 namespace fly
 {
 
+namespace
+{
+
+uint GetMaxTextureUnits()
+{
+    int result;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &result);
+    return static_cast<uint>(result);
+}
+
+}
+
+TextureManager::TextureManager() :
+    m_maxTextures(GetMaxTextureUnits()),
+    m_counter(0)
+{}
+
 bool TextureManager::priv_uploadFile(const std::string& name, const std::string& filetype)
 {
-    if (m_counter >= GL_MAX_TEXTURE_UNITS)
+    if (m_counter >= m_maxTextures)
     {
         LOG(Error) << "Exceeded the maximum texture units available." << std::endl;
         return false;
@@ -92,7 +109,6 @@ uint TextureManager::priv_generateTexture(const std::string& name)
     m_samplerMap.emplace(name, m_counter++);
     return texture;
 }
-
 
 TextureManager::~TextureManager()
 {

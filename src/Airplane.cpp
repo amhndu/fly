@@ -43,7 +43,7 @@ void Airplane::update(float dt)
         dAngleX     = M_PI / 3.f * m_aileron * dt;
     else
         dAngleX     = sign(m_up.z) * -sign(m_left.z) * std::sqrt(std::abs(m_left.z)) * M_PI / 6.f * dt;
-    if (dAngleX != 0.f)
+    if (std::abs(dAngleX) > 1e-5)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleX, {1.f, 0.f, 0.f});
 
     float dAngleY = 0.f;
@@ -51,7 +51,7 @@ void Airplane::update(float dt)
         dAngleY     = (M_PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
     else
         dAngleY     = sign(m_up.z) * sign(m_forward.z) * std::sqrt(std::abs(m_forward.z)) * M_PI / 4.f * dt;
-    if (dAngleY != 0.f)
+    if (std::abs(dAngleY) > 1e-5)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleY, {0.f, 1.f, 0.f});
 
     m_forward = glm::normalize(m_rotationMatrix[0]);
