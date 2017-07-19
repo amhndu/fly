@@ -3,11 +3,11 @@ Fly
 
 ![fly-screenshot](screenshot.png)
 
-A simple flight simulator.
+A simple flight simulator in C++11/OpenGL.
 
-Features a procedurally generated infinite terrain over which you fly around.
+Features a procedurally generated infinite terrain over which you can fly around.
 
-Dependencies:
+External dependencies:
 
 * SFML
 * GLEW
@@ -36,9 +36,9 @@ usage: Fly [options...]
 
 YouTube Playlist:
 ------------------
-https://www.youtube.com/playlist?list=PLiULt7qySWt20wzP\_o6aeUNaClIziR0TR
+[Link to YouTube Playlist](https://www.youtube.com/playlist?list=PLiULt7qySWt20wzP_o6aeUNaClIziR0TR)
 
 
 Contact:
 --------------------
-amhndu ~at~ gmail
+amhndu ..at.. gmail
