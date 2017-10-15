@@ -11,6 +11,7 @@
 #include "Utility.h"
 #include "Sky.h"
 #include "ShadowMap.h"
+#include "CameraController.h"
 
 struct Options
 {
@@ -31,19 +32,24 @@ void printHelp()
               << "usage: Fly [options...]" << std::endl
               << std::endl
               << "-h   | --help        Print this help text and exit" << std::endl
-              << "-w X | wX            Set window width to X (default: " << DefaultOptions.windowWidth << ")" << std::endl
-              << "-H Y | HY            Set window height to Y (default: " << DefaultOptions.windowHeight << ")" << std::endl
+              << "-w X | wX            Set window width to X (default: "
+                << DefaultOptions.windowWidth << ")" << std::endl
+              << "-H Y | HY            Set window height to Y (default: "
+                << DefaultOptions.windowHeight << ")" << std::endl
               << "-s Z | sZ            Set seed to Z (default: random seed)" << std::endl
               << "-f   | --fullscreen  Set fullscreen mode (default: " << std::boolalpha
-                                                                     << DefaultOptions.fullscreen << ")" << std::endl
+                << DefaultOptions.fullscreen << ")" << std::endl
               << "--wireframe          Render in wireframe mode (default: " << std::boolalpha
-                                                                     << DefaultOptions.wireframe << ")" << std::endl
+                << DefaultOptions.wireframe << ")" << std::endl
               << std::endl;
 }
 
 Options processArguments(int argc, char** argv)
 {
     using namespace fly;
+
+    OBB obb({2,2,2}, glm::mat4{});
+
 
     std::vector<std::string> arguments;
     Options opts = DefaultOptions;
@@ -167,8 +173,12 @@ int main(int argc, char** argv)
     glewExperimental = GL_TRUE;
     glewInit();
 
+    // GLEW bug where glewInit() sets GL_INVALID_ENUM
+    glGetError();
+
     TextureManager::uploadFile("terrain_lookup", ".png");
-    TextureManager::uploadFile("TropicalSunnyDay/TropicalSunnyDay", ".png", TextureManager::TextureCube);
+    TextureManager::uploadFile("TropicalSunnyDay/TropicalSunnyDay", ".png",
+                               TextureManager::TextureCube);
 
     // The default projection matrix
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
@@ -193,6 +203,8 @@ int main(int argc, char** argv)
                   aircraft.getForwardDirection(),       // Direction
                   aircraft.getUpDirection(),           // Up
                   aircraft);
+
+    CameraController mouse_camera(window, camera);
 
     // Set up input callbacks
     Controller controller(window);
@@ -244,6 +256,7 @@ int main(int argc, char** argv)
 
             aircraft.update(frame_period_seconds);
             terrain.setCenter(aircraft.getPosition());
+            mouse_camera.update(frame_period_seconds);
             camera.updateView(frame_period_seconds);
 
             if (camera.viewChanged())
@@ -256,6 +269,10 @@ int main(int argc, char** argv)
 
             auto&& light_space = shadowMap.update();
             terrain.setLightSpace(light_space);
+            if (terrain.above({aircraft.getLocalBounds().dimensions, aircraft.getModel()}))
+            {
+                aircraft.flash();
+            }
 
             glClear(GL_DEPTH_BUFFER_BIT);
             aircraft.draw();

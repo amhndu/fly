@@ -7,17 +7,14 @@
 namespace fly
 {
 
-namespace
+static uint GetMaxTextureUnits()
 {
-
-uint GetMaxTextureUnits()
-{
-    int result;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &result);
+    static int result = -1;
+    if (result == -1)
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &result);
     return static_cast<uint>(result);
 }
 
-}
 
 TextureManager::TextureManager() :
     m_maxTextures(GetMaxTextureUnits()),

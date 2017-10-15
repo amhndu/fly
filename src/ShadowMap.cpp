@@ -65,13 +65,13 @@ const glm::mat4 ShadowMap::update()
     glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    glCullFace(GL_FRONT);
+//     glCullFace(GL_FRONT);
     // The position attribute assumed to be located at 0
     m_shaderProgram.setUniform("lightSpace", light_space);
     m_shaderProgram.setUniform("model", m_airplane.getModel());
     m_airplane.rawDraw();
 
-    glCullFace(GL_BACK);
+//     glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(viewport_save[0], viewport_save[1], viewport_save[2], viewport_save[3]);
 

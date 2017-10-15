@@ -9,6 +9,7 @@ uniform vec3  ambient_color;
 uniform vec3  diffuse_color;
 uniform vec3  specular_color;
 uniform float specular_exponent;
+uniform bool  flash;
 
 out vec4 outColor;
 
@@ -16,6 +17,12 @@ vec3 light_color = vec3( 1.0,  1.0,  1.0);
 
 void main()
 {
+    if (flash)
+    {
+        outColor = vec4(1.0, 0.0, 0.0, 1.0);
+        return;
+    }
+
     vec3  norm = normalize(Normal);
 
     // ambient

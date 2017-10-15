@@ -38,6 +38,7 @@ public:
     bool setUniform(GLint uniform, const glm::mat4& matrix);
     bool setUniform(GLint uniform, const glm::vec3& vec);
     bool setUniform(GLint uniform, int value);
+    bool setUniform(GLint uniform, bool value);
     template <typename T>
     bool inline setUniform(const std::string& name, const T& value)
     { return setUniform(getUniformLocation(name), value); }

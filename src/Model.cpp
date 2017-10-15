@@ -1,12 +1,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <OBJ_Loader.h>
 #include <unordered_map>
+#include <algorithm>
 #include "Model.h"
 #include "Log.h"
 #include "Utility.h"
 
 namespace fly
 {
+
+
+inline static glm::vec3 to_vec3(const objl::Vector3& v)
+{
+    return {v.X, v.Y, v.Z};
+}
+
 
 Model::Model(const std::string& model_path)
 {
@@ -38,8 +46,24 @@ Model::Model(const std::string& model_path)
                                           offsetof(objl::Vertex, Position));
         m_shaderProgram.setAttributeFloat("normal",   3, sizeof(objl::Vertex),
                                           offsetof(objl::Vertex, Normal));
-        // m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(objl::Vertex), offsetof(objl::Vertex, TextureCoordinate));
+        // m_shaderProgram.setAttributeFloat("texcoords", 2, sizeof(objl::Vertex),
+        // offsetof(objl::Vertex, TextureCoordinate));
         // TODO Remove texcoords (since I'm not using it, instead of wasting precious GPU memory)
+
+        // Calculate bounding box
+        glm::vec3 min {to_vec3(loader.LoadedVertices.front().Position)};
+        glm::vec3 max {min};
+        for (const auto& vertex : loader.LoadedVertices)
+        {
+            auto vec = to_vec3(vertex.Position);
+
+            min = component_wise_apply(min, vec, std::min);
+            max = component_wise_apply(max, vec, std::max);
+        }
+        m_localBounds.dimensions = max - min;
+        m_localBounds.position   = (max + min) / 2.f;
+        LOG(Info) << "Model size: " << m_localBounds.dimensions << std::endl;
+        LOG(Info) << "Model center: " << m_localBounds.position << std::endl;
 
         std::unordered_map<std::string, std::size_t> materials_map;
 
@@ -81,18 +105,28 @@ Model::~Model()
 
 void Model::draw()
 {
-    m_shaderProgram.use();
-    m_vao.bind();
-    for (auto& mesh : m_meshes)
+    if (m_flash)
     {
-        m_shaderProgram.setUniform("ambient_color",     mesh.material.ambient_color);
-        m_shaderProgram.setUniform("diffuse_color",     mesh.material.diffuse_color);
-        m_shaderProgram.setUniform("specular_exponent", mesh.material.specular_exponent);
-        m_shaderProgram.setUniform("specular_color",    mesh.material.specular_color);
-        glDrawElements(GL_TRIANGLES, mesh.elements_size, GL_UNSIGNED_INT,
-                       reinterpret_cast<void*>(mesh.elements_offset * sizeof(unsigned int)));
+        m_shaderProgram.setUniform("flash", true);
+        rawDraw();
+        m_shaderProgram.setUniform("flash", false);
+        m_flash = false;
     }
-    m_vao.unbind();
+    else
+    {
+        m_shaderProgram.use();
+        m_vao.bind();
+        for (auto& mesh : m_meshes)
+        {
+            m_shaderProgram.setUniform("ambient_color",     mesh.material.ambient_color);
+            m_shaderProgram.setUniform("diffuse_color",     mesh.material.diffuse_color);
+            m_shaderProgram.setUniform("specular_exponent", mesh.material.specular_exponent);
+            m_shaderProgram.setUniform("specular_color",    mesh.material.specular_color);
+            glDrawElements(GL_TRIANGLES, mesh.elements_size, GL_UNSIGNED_INT,
+                        reinterpret_cast<void*>(mesh.elements_offset * sizeof(unsigned int)));
+        }
+        m_vao.unbind();
+    }
 }
 
 void Model::rawDraw()

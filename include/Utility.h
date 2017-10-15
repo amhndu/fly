@@ -22,8 +22,13 @@ constexpr inline T sign(T x)
     return x != 0 ? x / std::abs(x) : 0;
 }
 
+inline glm::vec3 component_wise_apply(const glm::vec3& a, const glm::vec3& b,
+                                    const float& (*f)(const float&, const float&))
+{
+    return {f(a.x, b.x), f(a.y, b.y), f(a.z, b.z)};
+}
 
-inline std::ostream& operator<< (std::ostream& out, const glm::vec3& vec)
+inline std::ostream& operator<< (std::basic_ostream<char>& out, const glm::vec3& vec)
 {
     out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")" << "; ";
     return out;

@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "VertexArrayObject.h"
 #include "Drawable.h"
+#include "BoundingBox.h"
 
 namespace fly
 {
@@ -16,12 +17,16 @@ class Model : public Drawable
 public:
     Model(const std::string& model_path);
     ~Model();
-    void setView(const glm::mat4& view)       { m_shaderProgram.setUniform("view", view); }
-    void setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }
-    void setTransform(const glm::mat4& trans) { m_shaderProgram.setUniform("model", trans); }
-    void draw() override;
-    void rawDraw() override;
+    void  setView(const glm::mat4& view)       { m_shaderProgram.setUniform("view", view); }
+    void  setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }
+    void  setTransform(const glm::mat4& trans) { m_shaderProgram.setUniform("model", trans); }
+    const AABB& getLocalBounds()               { return m_localBounds; }
+    void  draw()    override;
+    void  rawDraw() override;
+    void  flash() { m_flash = true; }
 private:
+    bool  m_flash;
+
     ShaderProgram m_shaderProgram;
 
     struct Material
@@ -42,6 +47,8 @@ private:
 
     std::vector<Material> m_materials;
     std::vector<Mesh>     m_meshes;
+
+    AABB m_localBounds;
 
     uint m_totalElements;
 

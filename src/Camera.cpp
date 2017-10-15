@@ -10,13 +10,14 @@ namespace fly
 Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, Airplane& airplane) :
                     m_position(position),
                     m_direction(direction),
-                    m_up(up),
+                    m_up(glm::normalize(up)),
                     m_timer(0),
                     m_stationary(true),
                     m_viewChanged(true),
                     m_view(glm::lookAt(position, direction + position, up)),
                     m_airplane(airplane)
 {
+
 }
 
 glm::mat4 Camera::getView()
@@ -40,53 +41,24 @@ void Camera::rotate(float x, float y)
     {
         y = -y;
         float theta = multiplier * y;
-        auto prev_dir = m_direction, prev_up = m_up;
+        auto prev_dir = glm::normalize(m_direction), prev_up = glm::normalize(m_up);
         m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * prev_up);
     }
     if (x)
     {
         float theta = multiplier * x;
-        auto prev_dir = m_direction;
+        auto prev_dir = glm::normalize(m_direction);
         auto cross  = glm::normalize(glm::cross(m_direction, m_up));
         m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * cross);
     }
+    m_timer = 0.3f;
     m_viewChanged = true;
 }
 
 void Camera::updateView(float dt)
 {
     m_position    = m_airplane.getPosition();
-//     auto delta_direction = m_airplane.getForwardDirection() - m_direction;
-//     float z = delta_direction.z;
-//     delta_direction.z = 0;
-// //     auto len = glm::length(delta_direction);
-// //     if (len != 0.f)
-// //     {
-// //         delta_direction = glm::normalize(delta_direction)
-// //                           * std::min<float>(len, 0.4f * dt);
-// //         m_direction    += delta_direction;
-// //     }
-//     m_direction += delta_direction;
-//
-//     float z_delta = sign(z) * 0.2f * dt;
-//     if (m_timer > 0.f)
-//         m_timer -= dt;
-//     else if (not m_stationary)
-//     {
-//         if (std::abs(z) < z_delta)
-//         {
-//             m_direction += z;
-//             m_stationary = true;
-//         }
-//         else
-//             m_direction += z_delta;
-//     }
-//
-//     if (std::abs(z - z_delta) > 1e-2 && m_stationary)
-//     {
-//         m_timer = 0.4f;
-//         m_stationary = false;
-//     }
+
     auto delta_direction = m_airplane.getForwardDirection() - m_direction;
     auto len = glm::length(delta_direction);
 

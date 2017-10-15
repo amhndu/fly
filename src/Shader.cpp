@@ -138,5 +138,13 @@ bool ShaderProgram::setUniform(GLint uniform, const glm::vec3& vec)
     return ASSERT_GL_ERRORS();
 }
 
+bool ShaderProgram::setUniform(GLint uniform, bool value)
+{
+    use();
+    glUniform1i(uniform, value);
+    return ASSERT_GL_ERRORS();
+}
+
+
 
 }

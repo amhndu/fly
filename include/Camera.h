@@ -1,7 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 #include <glm/glm.hpp>
-#include <SFML/Window.hpp>
 #include "Shader.h"
 #include "Airplane.h"
 
