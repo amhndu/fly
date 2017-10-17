@@ -14,6 +14,7 @@ public:
     bool viewChanged() const { return m_viewChanged; }
     void updateView(float dt);
     void rotate(float x, float y);
+    void zoom(float delta);
     glm::mat4 getView();
 
 private:
@@ -21,8 +22,9 @@ private:
     glm::vec3 m_direction;
     glm::vec3 m_up;
     glm::vec3 m_planeUp;
-    float m_timer;
-    bool  m_stationary;
+    float     m_timer;
+    float     m_distance;
+    bool      m_stationary;
 
     bool      m_viewChanged;
     glm::mat4 m_view;

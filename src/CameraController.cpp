@@ -1,6 +1,7 @@
 #include "CameraController.h"
+#include "Log.h"
 #include <SFML/Window/Mouse.hpp>
-#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Event.hpp>
 
 namespace fly
 {
@@ -32,6 +33,14 @@ void CameraController::update(float dt)
     }
     else
         m_mouseDown = false;
+}
+
+void CameraController::passEvent(const sf::Event& event)
+{
+    if (event.type == sf::Event::MouseWheelScrolled)
+    {
+        m_camera.zoom(event.mouseWheelScroll.delta * -0.05f);
+    }
 }
 
 }

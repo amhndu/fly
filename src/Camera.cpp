@@ -12,6 +12,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 direction, glm::vec3 up, Airplane& 
                     m_direction(direction),
                     m_up(glm::normalize(up)),
                     m_timer(0),
+                    m_distance(0.2f),
                     m_stationary(true),
                     m_viewChanged(true),
                     m_view(glm::lookAt(position, direction + position, up)),
@@ -25,8 +26,8 @@ glm::mat4 Camera::getView()
     if (m_viewChanged)
     {
         m_view = glm::lookAt(m_position -
-            glm::normalize(glm::vec3{m_direction.x, m_direction.y, m_direction.z}) * 0.2f
-                         + glm::vec3{0.f, 0.f, 1.f - m_direction.z} * 0.06f,  // eye
+            glm::normalize(glm::vec3{m_direction.x, m_direction.y, m_direction.z}) * m_distance
+                         + glm::vec3{0.f, 0.f, 1.f - m_direction.z} * (m_distance * 0.3f),  // eye
             m_position,  // center
             m_up);
         m_viewChanged = false;
@@ -52,6 +53,12 @@ void Camera::rotate(float x, float y)
         m_direction = glm::normalize(std::cos(theta) * prev_dir + std::sin(theta) * cross);
     }
     m_timer = 0.3f;
+    m_viewChanged = true;
+}
+
+void Camera::zoom(float delta)
+{
+    m_distance += delta;
     m_viewChanged = true;
 }
 

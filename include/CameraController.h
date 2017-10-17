@@ -12,6 +12,7 @@ class CameraController
 public:
     CameraController(sf::Window& window, Camera& camera);
     void update(float dt);
+    void passEvent(const sf::Event& event);
 private:
     sf::Window&     m_window;
     Camera&         m_camera;

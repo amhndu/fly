@@ -13,6 +13,8 @@
 #include "ShadowMap.h"
 #include "CameraController.h"
 
+#include "Box.h"
+
 struct Options
 {
     float seed;
@@ -22,9 +24,10 @@ struct Options
     bool  wireframe;
     bool  showHelp;
     bool  fullscreen;
+    bool  planeBox;
 };
 
-const Options DefaultOptions {0.f, 1024u, 720u, false, false, false, false};
+const Options DefaultOptions {0.f, 1024u, 720u, false, false, false, false, false};
 
 void printHelp()
 {
@@ -41,6 +44,8 @@ void printHelp()
                 << DefaultOptions.fullscreen << ")" << std::endl
               << "--wireframe          Render in wireframe mode (default: " << std::boolalpha
                 << DefaultOptions.wireframe << ")" << std::endl
+              << "--plane-box          Draw a bounding box around the plane (default: " << std::boolalpha
+                << DefaultOptions.planeBox << ")" << std::endl
               << std::endl;
 }
 
@@ -69,6 +74,11 @@ Options processArguments(int argc, char** argv)
         {
             opts.wireframe = true;
             LOG(Info) << "Rendering in wireframe mode." << std::endl;
+        }
+        else if (arg == "--plane-box")
+        {
+            opts.planeBox = true;
+            LOG(Info) << "Drawing bounding box around plane." << std::endl;
         }
         else if (arg.substr(0, 2) == "-w")
         {
@@ -206,6 +216,16 @@ int main(int argc, char** argv)
 
     CameraController mouse_camera(window, camera);
 
+    std::unique_ptr<Box> box;
+    if (opts.planeBox)
+    {
+        box.reset(new Box());
+        box->setProjection(projection_matrix);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+
     // Set up input callbacks
     Controller controller(window);
     controller.setCallback(Controller::RollLeft,     std::bind(&Airplane::roll,    &aircraft, -1));
@@ -244,14 +264,14 @@ int main(int argc, char** argv)
             }
             else if (event.type == sf::Event::LostFocus)
                 focus = false;
+            else
+                mouse_camera.passEvent(event);
 
         }
 
         auto now = std::chrono::steady_clock::now();
         while (focus && now - prev_time > frame_period)
         {
-            // Render frame
-
             controller.takeInput(frame_period_seconds);
 
             aircraft.update(frame_period_seconds);
@@ -265,17 +285,26 @@ int main(int argc, char** argv)
                 terrain.setView(view);
                 aircraft.setView(view);
                 sky.setView(view);
+                if (opts.planeBox)
+                    box->setView(view);
             }
 
             auto&& light_space = shadowMap.update();
+            auto boundingBox = glm::translate(aircraft.getModel(),
+                                              aircraft.getLocalBounds().position);
             terrain.setLightSpace(light_space);
-            if (terrain.above({aircraft.getLocalBounds().dimensions, aircraft.getModel()}))
+            if (terrain.above({aircraft.getLocalBounds().dimensions, boundingBox}))
             {
                 aircraft.flash();
             }
 
             glClear(GL_DEPTH_BUFFER_BIT);
             aircraft.draw();
+            if (opts.planeBox)
+            {
+                box->setTransform(glm::scale(boundingBox, aircraft.getLocalBounds().dimensions));
+                box->draw();
+            }
             terrain.draw();
             sky.draw();
 
@@ -283,7 +312,8 @@ int main(int argc, char** argv)
 
             prev_time += frame_period;
         }
-        sf::sleep(sf::seconds(1.f / 60.f));  // For portability, as MinGW's this_thread::sleep_for is broken
+        // For portability, as MinGW's this_thread::sleep_for is broken
+        sf::sleep(sf::seconds(1.f / 60.f));
     }
 
     window.close();

@@ -30,7 +30,6 @@ private:
     std::function<void(float, float)> m_rotateCallback;
     std::function<void(void)> m_callbacks[TotalEvents];
     sf::Window& m_window;
-    sf::Vector2i m_prevMouse;
 };
 
 }

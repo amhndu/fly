@@ -134,33 +134,33 @@ bool Terrain::above(const OBB& obb)
     const auto bounds_high = box.position + box.dimensions / 2.f;
 
     bool collision = false;
-    for (int cx = std::floor(bounds_low.x + 0.5f); !collision
-                && cx <= static_cast<int>(std::floor(bounds_high.x + 0.5f)); ++cx)
-    {
-        for (int cy = std::floor(bounds_low.y + 0.5f); !collision
-             && cy <= static_cast<int>(std::floor(bounds_high.y + 0.5f)); ++cy)
-        {
-            auto offset = m_verticesPerChunk * (getChunkIndexX(cx) * (2 * m_radius - 1)
-                        + getChunkIndexY(cy));
-            for (int i = 0; i < m_verticesPerChunk; ++i)
-            {
-                float x = cx + 1.f * (i / (m_detail + 1)) / m_detail - 0.5f,
-                      y = cy + 1.f * (i % (m_detail + 1)) / m_detail - 0.5f;
-                if (   bounds_low.x < x
-                    && bounds_high.x > x
-                    && bounds_low.y < y
-                    && bounds_high.x > y
-                    && m_heightMap[offset + i] > bounds_low.z)
-                {
-                    collision = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    if (!collision)
-        return false;
+//     for (int cx = std::floor(bounds_low.x + 0.5f); !collision
+//                 && cx <= static_cast<int>(std::floor(bounds_high.x + 0.5f)); ++cx)
+//     {
+//         for (int cy = std::floor(bounds_low.y + 0.5f); !collision
+//              && cy <= static_cast<int>(std::floor(bounds_high.y + 0.5f)); ++cy)
+//         {
+//             auto offset = m_verticesPerChunk * (getChunkIndexX(cx) * (2 * m_radius - 1)
+//                         + getChunkIndexY(cy));
+//             for (int i = 0; i < m_verticesPerChunk; ++i)
+//             {
+//                 float x = cx + 1.f * (i / (m_detail + 1)) / m_detail - 0.5f,
+//                       y = cy + 1.f * (i % (m_detail + 1)) / m_detail - 0.5f;
+//                 if (   bounds_low.x < x
+//                     && bounds_high.x > x
+//                     && bounds_low.y < y
+//                     && bounds_high.x > y
+//                     && m_heightMap[offset + i] > bounds_low.z)
+//                 {
+//                     collision = true;
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+//
+//     if (!collision)
+//         return false;
 
     collision = false;
     for (int cx = std::floor(bounds_low.x + 0.5f); !collision
@@ -171,8 +171,11 @@ bool Terrain::above(const OBB& obb)
         {
             auto offset = m_verticesPerChunk * (getChunkIndexX(cx) * (2 * m_radius - 1)
                         + getChunkIndexY(cy));
-            for (int i = 0; i + 1 < m_verticesPerChunk - (m_detail + 1); i += 2)
+            for (int i = 0; i + 1 < m_verticesPerChunk - (m_detail + 1); i += 1)
             {
+                if ((i + 1) % (m_detail + 1) == 0)
+                    continue;
+
                 glm::vec3 a {cx + 1.f * (i / (m_detail + 1)) / m_detail - 0.5f,
                              cy + 1.f * (i % (m_detail + 1)) / m_detail - 0.5f,
                              m_heightMap[offset + i]};
@@ -189,13 +192,21 @@ bool Terrain::above(const OBB& obb)
                              cy + 1.f * ((i + 1 + m_detail + 1) % (m_detail + 1)) / m_detail - 0.5f,
                              m_heightMap[offset + i + 1 + m_detail + 1]};
 
+
                 auto normal1 = glm::cross(c - a, b - a);
-                auto normal2 = glm::cross(b - d, c - d);
+                auto normal2 = glm::cross(d - b, d - c);
+                assert(normal1.z > 0 && normal2.z > 0);
 
                 for (auto point : obb.points)
                 {
-                    if (glm::dot(normal1, point) < 0 || glm::dot(normal2, point))
+                    if (a.x < point.x && c.x > point.x
+                     && a.y < point.y && b.y > point.y
+                     && (glm::dot(normal1, point - a) < 0
+                      || glm::dot(normal2, point - d) < 0))
+                    {
+
                         return true;
+                    }
                 }
             }
         }
