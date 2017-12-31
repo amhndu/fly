@@ -100,12 +100,12 @@ private:
 class ExplosionEmitter
 {
 public:
-    ExplosionEmitter(const glm::vec3& center, const glm::vec3& up, const glm::vec3& gravity)
+    ExplosionEmitter(const glm::vec3& center, const glm::vec3& up, const glm::vec3& gravity,
+                     float emitter_speed)
         : m_center(center)
         , m_up(glm::normalize(up))
         , m_gravity(gravity)
     {
-        float emitter_speed = 0.08f;
         auto velPerpendicular = glm::normalize(glm::vec3{0.f, -m_up.z, m_up.y});
         const int sub_emitters = 10;
         m_subEmitters.reserve(sub_emitters);
@@ -115,7 +115,7 @@ public:
                                       (float) lerp(get_rand(), M_PI_2 / 5, M_PI_2), velPerpendicular);
             em_vel = glm::rotate(em_vel, (float) M_PI * 2.f * get_rand(), m_up);
             m_subEmitters.push_back({em_vel,
-                                UniformConeImpl(100, center, {}, {}, 2.f, 5.f, 0.001f, 0.010f, M_PI_2, 250)});
+                                UniformConeImpl(150, center, {}, {}, 2.f, 5.f, 0.009f, 0.014f, M_PI_2, 250)});
         }
     }
     void operator() (float dt, ParticleData& data)
@@ -154,9 +154,10 @@ ParticleEmitter createUniformCone(float rate, const glm::vec3& startingPosition,
                            minLife, maxLife, sizeMin, sizeMax, angle, particlesToEmit);
 }
 
-ParticleEmitter createExplosion(const glm::vec3& center, const glm::vec3& spread_up, const glm::vec3& gravity)
+ParticleEmitter createExplosion(const glm::vec3& center, const glm::vec3& spread_up,
+                                const glm::vec3& gravity, float emitter_speed)
 {
-    return ExplosionEmitter(center, spread_up, gravity);
+    return ExplosionEmitter(center, spread_up, gravity, emitter_speed);
 }
 
 }

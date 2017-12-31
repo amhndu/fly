@@ -147,6 +147,8 @@ int main(int argc, char** argv)
     std::srand(std::time(nullptr));
 
     Options opts = processArguments(argc, argv);
+    // FIXME
+//    opts.planeBox = true;
     if (opts.showHelp)
     {
         printHelp();
@@ -293,7 +295,7 @@ int main(int argc, char** argv)
 //                particles.addEmitter(Emitter::createUniformCone(300, aircraft.getPosition(), glm::vec3{0.001f},
 //                    aircraft.getUpDirection() * 0.005f, 3.f, 8.f, 0.02f, 0.05f, M_PI_2, 400));
 //                particles.addEmitter(Emitter::createExplosion(aircraft.getPosition(), aircraft.getUpDirection(),
-//                                                       -0.01f * aircraft.getUpDirection()));
+//                                                       {0.f, 0.f, -0.05f}, 0.01f);
 //                particles.addUpdater(Updater::basicPhysics);
 //                particles.addUpdater(Updater::lifeUpdater);
 //                particles.addUpdater(Updater::fireColor);
@@ -347,10 +349,11 @@ int main(int argc, char** argv)
                 particles.reset(3000);
                 particles.addEmitter(Emitter::createUniformCone(600, aircraft.getPosition(),
                             glm::vec3{0.001f}, aircraft.getUpDirection() * 0.018f,
-                            4.f, 8.f, 0.02f, 0.05f, M_PI_2, 400));
+                            4.f, 8.f, 0.08f, 0.15f, M_PI_2, 400));
                 particles.addEmitter(Emitter::createExplosion(aircraft.getPosition(),
                                                               aircraft.getUpDirection(),
-                                                              {0.f, 0.f, -0.05f}));
+                                                              {0.f, 0.f, -0.05f},
+                                                              0.08f));
                 particles.addUpdater(Updater::basicPhysics);
                 particles.addUpdater(Updater::lifeUpdater);
                 particles.addUpdater(Updater::fireColor);
@@ -363,12 +366,12 @@ int main(int argc, char** argv)
              if (opts.wireframe)
                 glClear(GL_COLOR_BUFFER_BIT);
             aircraft.draw();
+            terrain.draw();
             if (opts.planeBox)
             {
                 box->setTransform(glm::scale(boundingBox, aircraft.getLocalBounds().dimensions));
                 box->draw();
             }
-            terrain.draw();
             sky.draw();
             particles.getRenderer().draw(main_frame_buffer);
 

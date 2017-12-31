@@ -15,7 +15,8 @@ ParticleEmitter createUniformCone(float rate, const glm::vec3& startingPosition,
                               const glm::vec3& startingVelocity, float minLife, float maxLife,
                               float sizeMin, float sizeMax, float coneAngle, int particlesToEmit = -1);
 
-ParticleEmitter createExplosion(const glm::vec3& center, const glm::vec3& spread_up, const glm::vec3& gravity);
+ParticleEmitter createExplosion(const glm::vec3& center, const glm::vec3& spread_up,
+                                const glm::vec3& gravity, float emitter_speed);
 
 }
 

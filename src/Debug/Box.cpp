@@ -70,7 +70,7 @@ Box::Box()
         out vec4 outColor;
         void main()
         {
-            outColor = vec4(vec3(0.5), 0.3);
+            outColor = vec4(vec3(0.1), 0.2);
         }
         )gl";
 
@@ -89,9 +89,11 @@ void Box::draw()
 {
     m_shader.use();
     m_vao.bind();
-    glDisable(GL_CULL_FACE);
+    glDepthMask(GL_FALSE);
+//    glDisable(GL_CULL_FACE);
     glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
 //     glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
     m_vao.unbind();
 }
 

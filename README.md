@@ -1,25 +1,44 @@
-# stackledge
+Fly
+=====
 
-A reddit clone.
+![fly-screenshot](screenshot.png)
 
-* Upvote/downvote based content aggregation
-* Threaded comments
-* User pages, indiviudal category and all categories pages
-* Trending, Top, New sorting modes
-* Feed paginated
+A simple flight simulator in C++11/OpenGL.
 
-## screenshots
+Features a procedurally generated infinite terrain over which you can fly around.
 
-![screenshot1](screenshots/stackledge1.png)
-------------------------------
-![screenshot2](screenshots/stackledge2.png)
-------------------------------
-![screenshot3](screenshots/stackledge3.png)
-------------------------------
-![screenshot4](screenshots/stackledge4.png)
+External dependencies:
+
+* SFML
+* GLEW
 
 
-## deploying
+Should be available in your repos. Once, installed, run cmake on the project directory.
 
-Set public_html/ as the public directory, import the schema and
-create new categories by inserting into the Category table
+
+Controls:
+-----------
+WASD or Arrow keys to change the plane's direction
+
+
+Command line arguments:
+-----------------------------
+```
+usage: Fly [options...]
+
+-h   | --help        Print this help text and exit
+-w X | wX            Set window width to X (default: 1024)
+-H Y | HY            Set window height to Y (default: 720)
+-s Z | sZ            Set seed to Z (default: random seed)
+-f   | --fullscreen  Set fullscreen mode (default: false)
+--wireframe          Render in wireframe mode (default: false)
+```
+
+YouTube Playlist:
+------------------
+[Link to YouTube Playlist](https://www.youtube.com/playlist?list=PLiULt7qySWt20wzP_o6aeUNaClIziR0TR)
+
+
+Contact:
+--------------------
+amhndu ..at.. gmail
