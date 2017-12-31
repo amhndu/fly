@@ -101,9 +101,14 @@ uint TextureManager::priv_generateTexture(const std::string& name)
 {
     GLuint texture;
     glGenTextures(1, &texture);
-    glActiveTexture(GL_TEXTURE0 + m_counter);
+    LOG(Debug) << "Generated texture " << name << " id " << texture << " sampler " << m_counter << std::endl;
     m_textures.push_back(texture);
-    m_samplerMap.emplace(name, m_counter++);
+    glActiveTexture(GL_TEXTURE0 + m_counter);
+    if (!name.empty())
+    {
+        m_samplerMap.emplace(name, m_counter);
+    }
+    ++m_counter;
     return texture;
 }
 

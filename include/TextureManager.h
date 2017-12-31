@@ -18,7 +18,7 @@ public:
     static bool uploadFile(const std::string& name, const std::string& filetype, bool cube = false)
     { return cube ? get().priv_uploadCube(name, filetype) : get().priv_uploadFile(name, filetype); }
     static int  getSampler(const std::string& name) { return get().priv_getSampler(name); }
-    static uint generateTexture(const std::string& name) { return get().priv_generateTexture(name); }
+    static uint generateTexture(const std::string& name = "") { return get().priv_generateTexture(name); }
 private:
     TextureManager();
 

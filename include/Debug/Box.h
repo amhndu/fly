@@ -1,5 +1,5 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef FLY_BOX_H
+#define FLY_BOX_H
 #include "Shader.h"
 #include "VertexArrayObject.h"
 
@@ -22,4 +22,4 @@ private:
 };
 
 }
-#endif // SPRITE_H
+#endif // FLY_BOX_H

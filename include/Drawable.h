@@ -12,6 +12,7 @@ namespace fly
 class Drawable
 {
 public:
+    virtual ~Drawable() {};
     // Setup the specific shader and draw
     virtual void  draw()    = 0;
     // Just draw, with whatever shader's bound. Used to create the shadow map.

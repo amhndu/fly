@@ -24,7 +24,7 @@ public:
     const   glm::vec3& getUpDirection() const { return m_up; }
     const   glm::mat4  getModel() override { return m_translationMatrix * m_rotationMatrix; }
     const   AABB&      getLocalBounds() { return m_model.getLocalBounds(); }
-    void    flash() { m_model.flash(); }
+    void    crash() { m_model.darken(); }
 private:
     glm::vec3 m_position;
     glm::vec3 m_forward;

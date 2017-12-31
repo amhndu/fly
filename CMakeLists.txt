@@ -10,7 +10,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 set(BUILD_STATIC FALSE CACHE STRING "Set this to link external libraries statically")
 
 if(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -g")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wnull-dereference -g")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 endif()
 
@@ -20,6 +20,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/;${CMAKE_MODULE_PATH};$
 # Add sources
 file(GLOB SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/Debug/*.cpp"
     "${PROJECT_SOURCE_DIR}/extlibs/src/*.cpp"
 )
 
@@ -63,9 +64,9 @@ endif()
 
 # Find SFML
 if (SFML_OS_WINDOWS AND SFML_COMPILER_MSVC)
-    find_package(SFML 2 COMPONENTS main audio graphics window system REQUIRED)
+    find_package(SFML 2 COMPONENTS main graphics window system REQUIRED)
 else()
-    find_package(SFML 2 COMPONENTS audio graphics window system REQUIRED)
+    find_package(SFML 2 COMPONENTS graphics window system REQUIRED)
 endif()
 
 find_package(GLEW REQUIRED)

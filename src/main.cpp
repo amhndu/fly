@@ -12,8 +12,9 @@
 #include "Sky.h"
 #include "ShadowMap.h"
 #include "CameraController.h"
-
-#include "Box.h"
+#include "ParticleSystem.h"
+#include "Sprite.h"
+#include "Debug/Box.h"
 
 struct Options
 {
@@ -189,6 +190,7 @@ int main(int argc, char** argv)
     TextureManager::uploadFile("terrain_lookup", ".png");
     TextureManager::uploadFile("TropicalSunnyDay/TropicalSunnyDay", ".png",
                                TextureManager::TextureCube);
+    TextureManager::uploadFile("flare", ".png");
 
     // The default projection matrix
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
@@ -221,10 +223,7 @@ int main(int argc, char** argv)
     {
         box.reset(new Box());
         box->setProjection(projection_matrix);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
-
 
     // Set up input callbacks
     Controller controller(window);
@@ -239,17 +238,38 @@ int main(int argc, char** argv)
     // GL setup
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-
     /* Wireframe mode */
     if (opts.wireframe)
-        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    glEnable(GL_BLEND);
+
+    auto main_frame_buffer = FrameBuffer::Builder(window.getSize().x, window.getSize().y)
+                                .attachColor0("mainFrameBuffer")
+                                .attachDepthTexture()
+                                .build();
+
+    ParticleSystem particles(3000);
+    particles.getRenderer().setProjection(projection_matrix);
+    particles.getRenderer().useFrameBuffer(FrameBuffer::Builder(window.getSize().x, window.getSize().y)
+                                            .attachColor0("particlesFrameBuffer")
+                                            .attachDepthTexture(main_frame_buffer.getDepthBuffer())
+                                            .build());
+    Sprite proxySprite;
+    proxySprite.setTexture(TextureManager::getSampler("mainFrameBuffer"));
+
+    int viewport_save[4];
+    glGetIntegerv(GL_VIEWPORT, viewport_save);
 
     auto prev_time = std::chrono::steady_clock::now();
     const std::chrono::steady_clock::duration frame_period(std::chrono::milliseconds(1000/60));
     const float frame_period_seconds = std::chrono::duration<float>(frame_period).count();
     sf::Event event;
+    // Perhaps use a state system here...
     bool running = true;
-    bool focus = true;
+    bool focus   = true;
+    bool paused  = false;
+    bool crashed = false;
     while (running)
     {
         while (window.pollEvent(event))
@@ -264,7 +284,23 @@ int main(int argc, char** argv)
             }
             else if (event.type == sf::Event::LostFocus)
                 focus = false;
-            else
+            else if (focus && event.type == sf::Event::KeyReleased
+                    && event.key.code == sf::Keyboard::F4)
+                paused = !paused;
+//            else if (focus && event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::E)
+//            {
+//                particles.reset(3000);
+//                particles.addEmitter(Emitter::createUniformCone(300, aircraft.getPosition(), glm::vec3{0.001f},
+//                    aircraft.getUpDirection() * 0.005f, 3.f, 8.f, 0.02f, 0.05f, M_PI_2, 400));
+//                particles.addEmitter(Emitter::createExplosion(aircraft.getPosition(), aircraft.getUpDirection(),
+//                                                       -0.01f * aircraft.getUpDirection()));
+//                particles.addUpdater(Updater::basicPhysics);
+//                particles.addUpdater(Updater::lifeUpdater);
+//                particles.addUpdater(Updater::fireColor);
+//                particles.addUpdater(Updater::createLinearSize(0.001f, 0.020f));
+//                particles.getRenderer().setBlending(Additive);
+//            }
+            else if (focus)
                 mouse_camera.passEvent(event);
 
         }
@@ -274,8 +310,16 @@ int main(int argc, char** argv)
         {
             controller.takeInput(frame_period_seconds);
 
-            aircraft.update(frame_period_seconds);
-            terrain.setCenter(aircraft.getPosition());
+            if (!paused)
+            {
+                if (!crashed)
+                {
+                    aircraft.update(frame_period_seconds);
+                    terrain.setCenter(aircraft.getPosition());
+                }
+                particles.update(frame_period_seconds);
+            }
+
             mouse_camera.update(frame_period_seconds);
             camera.updateView(frame_period_seconds);
 
@@ -285,20 +329,39 @@ int main(int argc, char** argv)
                 terrain.setView(view);
                 aircraft.setView(view);
                 sky.setView(view);
+                particles.getRenderer().setView(view);
                 if (opts.planeBox)
                     box->setView(view);
             }
 
             auto&& light_space = shadowMap.update();
+            terrain.setLightSpace(light_space);
+            glViewport(viewport_save[0], viewport_save[1], viewport_save[2], viewport_save[3]);
+
             auto boundingBox = glm::translate(aircraft.getModel(),
                                               aircraft.getLocalBounds().position);
-            terrain.setLightSpace(light_space);
-            if (terrain.above({aircraft.getLocalBounds().dimensions, boundingBox}))
+            if (!crashed && terrain.above({aircraft.getLocalBounds().dimensions, boundingBox}))
             {
-                aircraft.flash();
+                aircraft.crash();
+                crashed = true;
+                particles.reset(3000);
+                particles.addEmitter(Emitter::createUniformCone(600, aircraft.getPosition(),
+                            glm::vec3{0.001f}, aircraft.getUpDirection() * 0.018f,
+                            4.f, 8.f, 0.02f, 0.05f, M_PI_2, 400));
+                particles.addEmitter(Emitter::createExplosion(aircraft.getPosition(),
+                                                              aircraft.getUpDirection(),
+                                                              {0.f, 0.f, -0.05f}));
+                particles.addUpdater(Updater::basicPhysics);
+                particles.addUpdater(Updater::lifeUpdater);
+                particles.addUpdater(Updater::fireColor);
+                particles.addUpdater(Updater::createLinearSize(0.001f, 0.020f));
+                particles.getRenderer().setBlending(Additive);
             }
 
+            main_frame_buffer.bind();
             glClear(GL_DEPTH_BUFFER_BIT);
+             if (opts.wireframe)
+                glClear(GL_COLOR_BUFFER_BIT);
             aircraft.draw();
             if (opts.planeBox)
             {
@@ -307,7 +370,10 @@ int main(int argc, char** argv)
             }
             terrain.draw();
             sky.draw();
+            particles.getRenderer().draw(main_frame_buffer);
 
+            FrameBuffer::bindDefault();
+            proxySprite.draw();
             window.display();
 
             prev_time += frame_period;

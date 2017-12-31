@@ -17,6 +17,7 @@ inline static glm::vec3 to_vec3(const objl::Vector3& v)
 
 
 Model::Model(const std::string& model_path)
+    : m_monotoneColor(false)
 {
     m_vao.bind();
 
@@ -105,12 +106,12 @@ Model::~Model()
 
 void Model::draw()
 {
-    if (m_flash)
+    if (m_monotoneColor)
     {
         m_shaderProgram.setUniform("flash", true);
         rawDraw();
-        m_shaderProgram.setUniform("flash", false);
-        m_flash = false;
+//        m_shaderProgram.setUniform("flash", false);
+//        m_flash = false;
     }
     else
     {

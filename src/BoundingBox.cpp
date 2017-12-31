@@ -3,6 +3,7 @@
 #include "Log.h"
 #include "Utility.h"
 #include <algorithm>
+#include <numeric>
 
 namespace fly
 {

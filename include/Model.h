@@ -23,9 +23,9 @@ public:
     const AABB& getLocalBounds()               { return m_localBounds; }
     void  draw()    override;
     void  rawDraw() override;
-    void  flash() { m_flash = true; }
+    void  darken() { m_monotoneColor = true; }
 private:
-    bool  m_flash;
+    bool  m_monotoneColor;
 
     ShaderProgram m_shaderProgram;
 

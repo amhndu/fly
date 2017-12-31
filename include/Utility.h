@@ -22,6 +22,12 @@ constexpr inline T sign(T x)
     return x != 0 ? x / std::abs(x) : 0;
 }
 
+template <typename T, typename U>
+inline T lerp(T t, U&& a, U&& b)
+{
+    return a * (1 - t) + b * t;
+}
+
 inline glm::vec3 component_wise_apply(const glm::vec3& a, const glm::vec3& b,
                                     const float& (*f)(const float&, const float&))
 {

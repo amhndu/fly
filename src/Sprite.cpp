@@ -1,21 +1,25 @@
 #include "Sprite.h"
-#include <glm/gtc/matrix_transform.hpp>
 #include "Utility.h"
+#include <glm/gtc/matrix_transform.hpp>
+#include <string>
+#include "Log.h"
 
 namespace fly
 {
 
 Sprite::Sprite()
+    : m_recalculateModel(true)
+    , m_scale(1.f)
 {
     m_vao.bind();
     float vertices[] = {
-        -0.5f,  0.5f, 0.f, 0.f, // top-left
-        -0.5f, -0.5f, 0.f, 1.f, // bottom-left
-         0.5f, -0.5f, 1.f, 1.f, // bottom-right
+        -1.0f,  1.0f, 0.f, 1.f, // top-left
+        -1.0f, -1.0f, 0.f, 0.f, // bottom-left
+         1.0f, -1.0f, 1.f, 0.f, // bottom-right
 
-         0.5f, -0.5f, 1.f, 1.f, // bottom-right
-         0.5f,  0.5f, 1.f, 0.f, // top-right
-        -0.5f,  0.5f, 0.f, 0.f, // top-left
+         1.0f, -1.0f, 1.f, 0.f, // bottom-right
+         1.0f,  1.0f, 1.f, 1.f, // top-right
+        -1.0f,  1.0f, 0.f, 1.f, // top-left
         };
 
     const std::string vertex_shader = R"gl(
@@ -37,27 +41,32 @@ Sprite::Sprite()
         uniform sampler2D tex;
         void main()
         {
-            outColor = vec4(vec3(texture(tex, Texcoord)), 1.0);
+            outColor = texture(tex, Texcoord);
         }
         )gl";
 
     glGenBuffers(1, &m_vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-    assert(m_shader.loadShaderString(vertex_shader,   fly::Shader::Vertex));
-    assert(m_shader.loadShaderString(fragment_shader, fly::Shader::Fragment));
+    assert(m_shader.loadShaderString(vertex_shader,   Shader::Vertex));
+    assert(m_shader.loadShaderString(fragment_shader, Shader::Fragment));
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     m_shader.use();
     m_shader.setAttributeFloat("position", 2, 4 * sizeof(float), 0);
     m_shader.setAttributeFloat("texcoord", 2, 4 * sizeof(float), 2 * sizeof(float));
-    auto model = glm::translate(glm::mat4(1.f), glm::vec3{0.5, 0.5, 0.5});
-    model = glm::scale(model, glm::vec3{0.6, 0.6, 1.f});
-    m_shader.setUniform("model", model);
+
     m_vao.unbind();
-    using namespace fly;
     ASSERT_GL_ERRORS();
 }
+
 void Sprite::draw()
 {
+    if (m_recalculateModel)
+    {
+        auto model = glm::translate(glm::mat4(1.f), glm::vec3{m_position.x, m_position.y, 0.0f});
+        model = glm::scale(model, glm::vec3{m_scale.x, m_scale.y, 1.f});
+        m_shader.setUniform("model", model);
+        m_recalculateModel = false;
+    }
     glDisable(GL_DEPTH_TEST);
     m_shader.use();
     m_vao.bind();
@@ -67,6 +76,7 @@ void Sprite::draw()
 }
 void Sprite::setTexture(int texture)
 {
+    LOG(Debug) << "Texture " << texture << " set" << std::endl;
     m_shader.setUniform("tex", texture);
 }
 

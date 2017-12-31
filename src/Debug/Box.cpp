@@ -1,4 +1,4 @@
-#include "Box.h"
+#include "Debug/Box.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "Utility.h"
 
@@ -91,7 +91,7 @@ void Box::draw()
     m_vao.bind();
     glDisable(GL_CULL_FACE);
     glDrawArrays(GL_TRIANGLES, 0, 6 * 6);
-    glEnable(GL_CULL_FACE);
+//     glEnable(GL_CULL_FACE);
     m_vao.unbind();
 }
 
