@@ -19,7 +19,9 @@ Airplane::Airplane() :
     m_translationMatrix(glm::translate(glm::mat4(1.f), m_position)),
     m_rotationMatrix(1.f),
     m_aileron(0),
+    m_rollVelocity(0),
     m_elevator(0),
+    m_pitchVelocity(0),
     m_throttle(0),
     m_model("resources/airplane.obj")
 {
@@ -27,6 +29,11 @@ Airplane::Airplane() :
     m_model.setTransform(transform);
 }
 
+template <typename T>
+T inline clamp_magnitude(T val, T max)
+{
+    return std::min(std::max(val, -max), max);
+}
 
 void Airplane::update(float dt)
 {
@@ -38,19 +45,45 @@ void Airplane::update(float dt)
     }
 
 
-    float dAngleX = 0.f;
-    if (m_aileron) // roll
-        dAngleX     = M_PI / 3.f * m_aileron * dt;
+    float target_velocity, rate;
+    bool positive_velocity;
+    if (m_aileron)
+    {
+        target_velocity = PI / 3.f * m_aileron;
+        positive_velocity = m_aileron > 0;
+        rate = 0.035f;
+    }
     else
-        dAngleX     = sign(m_up.z) * -sign(m_left.z) * std::sqrt(std::abs(m_left.z)) * M_PI / 6.f * dt;
+    {
+        target_velocity = sign(m_up.z) * -sign(m_left.z) * std::sqrt(std::abs(m_left.z)) * PI / 6.f;
+        positive_velocity = sign(m_up.z) * -sign(m_left.z) > 0;
+        rate = 0.02f;
+    }
+    auto clamping_func = positive_velocity ? std::min<float> : std::max<float>;
+    m_rollVelocity = clamping_func(m_rollVelocity + target_velocity * rate, target_velocity);
+    float dAngleX = m_rollVelocity * dt;
     if (std::abs(dAngleX) > 1e-5)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleX, {1.f, 0.f, 0.f});
 
-    float dAngleY = 0.f;
     if (m_elevator)
-        dAngleY     = (M_PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
+    {
+        target_velocity = (PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator;
+        positive_velocity = m_elevator > 0;
+        rate = 0.08f;
+    }
     else
-        dAngleY     = sign(m_up.z) * sign(m_forward.z) * std::sqrt(std::abs(m_forward.z)) * M_PI / 4.f * dt;
+    {
+        target_velocity = sign(m_up.z) * sign(m_forward.z) * std::sqrt(std::abs(m_forward.z)) * PI / 4.f;
+        positive_velocity = sign(m_up.z) * sign(m_forward.z) > 0;
+        rate = 0.07f;
+    }
+    clamping_func = positive_velocity ? std::min<float> : std::max<float>;
+    m_pitchVelocity = clamping_func(m_pitchVelocity + target_velocity * rate, target_velocity);
+    float dAngleY = m_pitchVelocity * dt;
+//    if (m_elevator)
+//        dAngleY     = (PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
+//    else
+//        dAngleY     = sign(m_up.z) * sign(m_forward.z) * std::sqrt(std::abs(m_forward.z)) * PI / 4.f * dt;
     if (std::abs(dAngleY) > 1e-5)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleY, {0.f, 1.f, 0.f});
 

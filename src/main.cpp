@@ -346,14 +346,15 @@ int main(int argc, char** argv)
             {
                 aircraft.crash();
                 crashed = true;
-                particles.reset(3000);
-                particles.addEmitter(Emitter::createUniformCone(600, aircraft.getPosition(),
-                            glm::vec3{0.001f}, aircraft.getUpDirection() * 0.018f,
-                            4.f, 8.f, 0.08f, 0.15f, M_PI_2, 400));
+                particles.reset(5000);
+                particles.addEmitter(Emitter::createUniformCone(650 * 1.5f, aircraft.getPosition(),
+                            glm::vec3{0.001f}, aircraft.getUpDirection() * 0.023f,
+                            4.f, 5.f, 1.00f, 3.00f, PI / 4.f, 600));
                 particles.addEmitter(Emitter::createExplosion(aircraft.getPosition(),
-                                                              aircraft.getUpDirection(),
-                                                              {0.f, 0.f, -0.05f},
-                                                              0.08f));
+                                                              {0.f, 0.f, 1.f},
+//                                                              aircraft.getUpDirection(),
+                                                              {0.f, 0.f, -0.05f * 1.5f * 1.5f},
+                                                              0.10f * 1.5f));
                 particles.addUpdater(Updater::basicPhysics);
                 particles.addUpdater(Updater::lifeUpdater);
                 particles.addUpdater(Updater::fireColor);

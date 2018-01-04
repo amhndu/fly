@@ -7,14 +7,14 @@ namespace fly
 {
 
 
-class Airplane : Drawable
+class Airplane
 {
 public:
     Airplane();
     void    roll   (char direction) { m_aileron = direction; }
     void    elevate(char direction) { m_elevator = direction; }
-    void    draw() override { m_model.draw(); };
-    void    rawDraw() override { m_model.rawDraw(); }
+    void    draw(){ m_model.draw(); };
+    void    rawDraw() {m_model.rawDraw(); }
     void    throttle(char t)  {  m_throttle = t; }
     void    update(float dt);
     void    setProjection(const glm::mat4& proj) { m_model.setProjection(proj); }
@@ -22,7 +22,7 @@ public:
     const   glm::vec3& getPosition() const { return m_position; }
     const   glm::vec3& getForwardDirection() const { return m_forward; }
     const   glm::vec3& getUpDirection() const { return m_up; }
-    const   glm::mat4  getModel() override { return m_translationMatrix * m_rotationMatrix; }
+    const   glm::mat4  getModel(){ return m_translationMatrix * m_rotationMatrix; }
     const   AABB&      getLocalBounds() { return m_model.getLocalBounds(); }
     void    crash() { m_model.darken(); }
 private:
@@ -35,7 +35,9 @@ private:
     glm::mat4 m_translationMatrix;
     glm::mat4 m_rotationMatrix;
     char      m_aileron;
+    float     m_rollVelocity;
     char      m_elevator;
+    float     m_pitchVelocity;
     char      m_throttle;
     Model     m_model;
 };

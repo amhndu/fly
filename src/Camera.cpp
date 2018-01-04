@@ -37,7 +37,7 @@ glm::mat4 Camera::getView()
 
 void Camera::rotate(float x, float y)
 {
-    const float multiplier = M_PI / 6.f;
+    const float multiplier = PI / 6.f;
     if (y)
     {
         y = -y;

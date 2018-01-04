@@ -59,7 +59,7 @@ public:
                 // to get a uniform (spherical) distribution ... probably overkill
                 auto a = 2 * std::asin(std::sqrt(sq(std::sin(get_rand() * m_angle / 2.f))));
                 auto v = glm::rotate(m_startingVelocity, a, m_velPerpendicular);
-                v = glm::rotate(v, (float) M_PI * 2.f * get_rand(), m_startingVelocity);
+                v = glm::rotate(v, (float) PI * 2.f * get_rand(), m_startingVelocity);
                 data.velocityArray[pi] = v;
                 data.maxAgeArray[pi]   = lerp(get_rand(), m_lifeMin, m_lifeMax);
                 data.sizeArray[pi]     = lerp(get_rand(), m_sizeMin, m_sizeMax);
@@ -112,10 +112,11 @@ public:
         for (int i = 0; i < sub_emitters; ++i)
         {
             auto em_vel = glm::rotate(emitter_speed * m_up * lerp(get_rand(), 0.6f, 1.f),
-                                      (float) lerp(get_rand(), M_PI_2 / 5, M_PI_2), velPerpendicular);
-            em_vel = glm::rotate(em_vel, (float) M_PI * 2.f * get_rand(), m_up);
+                                      (float) lerp(get_rand(), PI / 2.f / 5, PI / 2.f), velPerpendicular);
+            em_vel = glm::rotate(em_vel, (float) PI * 2.f * get_rand(), m_up);
             m_subEmitters.push_back({em_vel,
-                                UniformConeImpl(150, center, {}, {}, 2.f, 5.f, 0.009f, 0.014f, M_PI_2, 250)});
+                                UniformConeImpl(200, center, {}, {}, 2.f, 5.f,
+                                                0.15f, 0.50f, PI / 2.f, 400)});
         }
     }
     void operator() (float dt, ParticleData& data)
@@ -124,7 +125,7 @@ public:
         {
             sub_em.velocity += m_gravity * dt;
             sub_em.impl.moveStartPosition(sub_em.velocity * dt);
-            sub_em.impl.setStartVelocity(glm::normalize(sub_em.velocity) * 0.007f);
+            sub_em.impl.setStartVelocity(glm::normalize(sub_em.velocity) * 0.008f);
             sub_em.impl(dt, data);
         }
     }

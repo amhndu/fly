@@ -63,7 +63,7 @@ Model::Model(const std::string& model_path)
         }
         m_localBounds.dimensions = max - min;
         m_localBounds.position   = (max + min) / 2.f;
-        LOG(Info) << "Model size: " << m_localBounds.dimensions << std::endl;
+        LOG(Info) << "Model size: "   << m_localBounds.dimensions << std::endl;
         LOG(Info) << "Model center: " << m_localBounds.position << std::endl;
 
         std::unordered_map<std::string, std::size_t> materials_map;
