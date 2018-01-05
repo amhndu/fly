@@ -51,6 +51,7 @@ bool TextureManager::priv_uploadFile(const std::string& name, const std::string&
     {
         m_textures.push_back(texture);
         m_samplerMap.emplace(name, m_counter++);
+        LOG(Debug) << "Uploaded texture " << name << std::endl;
     }
     else
         glDeleteTextures(1, &texture);

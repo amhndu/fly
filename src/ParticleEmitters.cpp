@@ -112,10 +112,10 @@ public:
         for (int i = 0; i < sub_emitters; ++i)
         {
             auto em_vel = glm::rotate(emitter_speed * m_up * lerp(get_rand(), 0.6f, 1.f),
-                                      (float) lerp(get_rand(), PI / 2.f / 5, PI / 2.f), velPerpendicular);
+                                      (float) lerp(get_rand(), PI / 12.f, PI / 3.f), velPerpendicular);
             em_vel = glm::rotate(em_vel, (float) PI * 2.f * get_rand(), m_up);
             m_subEmitters.push_back({em_vel,
-                                UniformConeImpl(200, center, {}, {}, 2.f, 5.f,
+                                UniformConeImpl(220, center, {}, {}, 2.f, 5.f,
                                                 0.15f, 0.50f, PI / 2.f, 400)});
         }
     }

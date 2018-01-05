@@ -4,7 +4,6 @@
 #include <vector>
 #include <unordered_map>
 #include "TerrainRenderer.h"
-#include "Drawable.h"
 #include "BoundingBox.h"
 
 
@@ -12,19 +11,15 @@ namespace fly
 {
 
 
-class Terrain : public Drawable
+class Terrain
 {
 public:
     Terrain(int radius, int detail);
     void generate(float seed);
     bool above(const OBB& obb);
-    void draw() override    { m_renderer.draw(); };
-    void rawDraw() override { m_renderer.rawDraw(); };
+    TerrainRenderer& getRenderer() { return m_renderer; }
     void moveCenter(const glm::vec2& displacement);
     void setCenter(const glm::vec2& pos) { moveCenter(pos - m_center); }
-    void setView(const glm::mat4& view) { m_renderer.setView(view); }
-    void setLightSpace(const glm::mat4& lm) { m_renderer.setLightSpace(lm); }
-    void setProjection(const glm::mat4& proj) { m_renderer.setProjection(proj); }
 private:
     int getChunkIndexX(int x);
     int getChunkIndexY(int y);

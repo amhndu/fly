@@ -29,12 +29,6 @@ Airplane::Airplane() :
     m_model.setTransform(transform);
 }
 
-template <typename T>
-T inline clamp_magnitude(T val, T max)
-{
-    return std::min(std::max(val, -max), max);
-}
-
 void Airplane::update(float dt)
 {
     if (m_throttle)
@@ -51,13 +45,13 @@ void Airplane::update(float dt)
     {
         target_velocity = PI / 3.f * m_aileron;
         positive_velocity = m_aileron > 0;
-        rate = 0.035f;
+        rate = 0.025f;
     }
     else
     {
         target_velocity = sign(m_up.z) * -sign(m_left.z) * std::sqrt(std::abs(m_left.z)) * PI / 6.f;
         positive_velocity = sign(m_up.z) * -sign(m_left.z) > 0;
-        rate = 0.02f;
+        rate = 0.014f;
     }
     auto clamping_func = positive_velocity ? std::min<float> : std::max<float>;
     m_rollVelocity = clamping_func(m_rollVelocity + target_velocity * rate, target_velocity);
@@ -65,41 +59,40 @@ void Airplane::update(float dt)
     if (std::abs(dAngleX) > 1e-5)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleX, {1.f, 0.f, 0.f});
 
+
     if (m_elevator)
     {
-        target_velocity = (PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator;
+        target_velocity = (PI / 4.f * (1.f - ((m_left.z)))) * m_elevator;
         positive_velocity = m_elevator > 0;
-        rate = 0.08f;
+        rate = 0.04f;
     }
     else
     {
         target_velocity = sign(m_up.z) * sign(m_forward.z) * std::sqrt(std::abs(m_forward.z)) * PI / 4.f;
         positive_velocity = sign(m_up.z) * sign(m_forward.z) > 0;
-        rate = 0.07f;
+        rate = 0.03f;
     }
     clamping_func = positive_velocity ? std::min<float> : std::max<float>;
     m_pitchVelocity = clamping_func(m_pitchVelocity + target_velocity * rate, target_velocity);
     float dAngleY = m_pitchVelocity * dt;
-//    if (m_elevator)
-//        dAngleY     = (PI / 4.f * (1.f - sq(sq(m_left.z)))) * m_elevator * dt;
-//    else
-//        dAngleY     = sign(m_up.z) * sign(m_forward.z) * std::sqrt(std::abs(m_forward.z)) * PI / 4.f * dt;
     if (std::abs(dAngleY) > 1e-5)
         m_rotationMatrix = glm::rotate(m_rotationMatrix, dAngleY, {0.f, 1.f, 0.f});
+
 
     m_forward = glm::normalize(m_rotationMatrix[0]);
     m_left    = glm::normalize(m_rotationMatrix[1]);
     m_up      = glm::normalize(m_rotationMatrix[2]);
 
+
     auto thrust  =  m_forward * 15.0f * m_speed / 1.0f;
     auto drag    = -glm::normalize(m_velocity) * (15.0f / sq(1.0f)) * glm::dot(m_velocity, m_velocity);
-    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 6.f;
-    glm::vec3 lift    =  {0.f, 0.f, (m_up * (6.f / sq(1.0f)) * sq(glm::dot(m_forward, m_velocity))).z};
+    glm::vec3 gravity =  glm::vec3(0, 0, -1) * 2.f;
+    glm::vec3 lift    =  {0.f, 0.f, (m_up * (2.f / 1.0f) * sq(glm::dot(m_forward, m_velocity))).z};
 
-    float sine = std::sqrt(1 - sq(glm::dot(m_up, glm::vec3{0.f, 0.f, 1.f})));
-    if (sine >= 0.1)
+    float cosine = std::abs(m_left.z);
+    if (cosine >= 0.1)
     {
-        float radius = 3.8f / sine;
+        float radius = 3.8f / cosine;
         auto centripetal = glm::normalize(glm::vec3{m_up.x, m_up.y, 0.f}) * glm::dot(m_velocity, m_velocity) / radius;
         lift += centripetal;
         auto direction = sign(glm::cross(m_velocity, centripetal).z);

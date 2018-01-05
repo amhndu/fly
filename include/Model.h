@@ -5,22 +5,23 @@
 #include <string>
 #include "Shader.h"
 #include "VertexArrayObject.h"
-#include "Drawable.h"
+#include "Renderer.h"
 #include "BoundingBox.h"
 
 namespace fly
 {
 
 
-class Model : public Drawable
+class Model : public Renderer
 {
 public:
     Model(const std::string& model_path);
     ~Model();
-    void  setView(const glm::mat4& view)       { m_shaderProgram.setUniform("view", view); }
-    void  setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }
+    void  setView(const glm::mat4& view) override { m_shaderProgram.setUniform("view", view); }
+    void  setProjection(const glm::mat4& proj) override { m_shaderProgram.setUniform("proj", proj); }
     void  setTransform(const glm::mat4& trans) { m_shaderProgram.setUniform("model", trans); }
-    const AABB& getLocalBounds()               { return m_localBounds; }
+    void  setLightDirection(const glm::vec3& dir) { m_shaderProgram.setUniform("light_direction", dir); }
+    const AABB& getLocalBounds() { return m_localBounds; }
     void  draw()    override;
     void  rawDraw() override;
     void  darken() { m_monotoneColor = true; }

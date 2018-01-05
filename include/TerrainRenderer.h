@@ -8,12 +8,12 @@
 #include "Shader.h"
 #include "Vertex.h"
 #include "VertexArrayObject.h"
-#include "Drawable.h"
+#include "Renderer.h"
 
 namespace fly
 {
 
-class TerrainRenderer : public Drawable
+class TerrainRenderer : public Renderer
 {
 public:
     TerrainRenderer(int radius, int detail);
@@ -25,9 +25,10 @@ public:
                      const std::vector<float>& colormap);
     void draw() override;
     void rawDraw() override;
-    void setView(const glm::mat4& view)       { m_shaderProgram.setUniform("view", view); }
+    void setView(const glm::mat4& view)      override { m_shaderProgram.setUniform("view", view); }
+    void setProjection(const glm::mat4& proj)override { m_shaderProgram.setUniform("proj", proj); }
+    void setLightDirection(const glm::vec3& dir) { m_shaderProgram.setUniform("light_direction", dir);}
     void setLightSpace(const glm::mat4& lm)   { m_shaderProgram.setUniform("lightSpace", lm); }
-    void setProjection(const glm::mat4& proj) { m_shaderProgram.setUniform("proj", proj); }
 private:
     ShaderProgram m_shaderProgram;
 

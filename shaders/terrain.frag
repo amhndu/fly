@@ -25,7 +25,7 @@ float underShadow()
         return 1.0;
     float closestDepth = texture(ShadowMap, projCoords.xy).r;
     float currentDepth = projCoords.z;
-    float bias = 0.0005;//max(0.005 * (1.0 - dot(Normal, LightDirection)), 0.0005); //0.0005;
+    float bias = 0;//0.00003;//max(0.005 * (1.0 - dot(Normal, LightDirection)), 0.0005); //0.0005;
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);

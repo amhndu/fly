@@ -6,6 +6,7 @@ Fly
 A simple flight simulator in C++11/OpenGL.
 
 Features a procedurally generated infinite terrain over which you can fly around.
+With custom-built particles sytstem for explosion.
 
 External dependencies:
 
@@ -18,7 +19,8 @@ Should be available in your repos. Once, installed, run cmake on the project dir
 
 Controls:
 -----------
-WASD or Arrow keys to change the plane's direction
+WASD or Arrow keys to change the plane's direction.
+Click anywhere on the screen and move the mouse to rotate the camera, and scroll to change zoom.
 
 
 Command line arguments:

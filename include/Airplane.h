@@ -11,14 +11,11 @@ class Airplane
 {
 public:
     Airplane();
+    Model&  getRenderer() { return m_model; }
     void    roll   (char direction) { m_aileron = direction; }
     void    elevate(char direction) { m_elevator = direction; }
-    void    draw(){ m_model.draw(); };
-    void    rawDraw() {m_model.rawDraw(); }
     void    throttle(char t)  {  m_throttle = t; }
     void    update(float dt);
-    void    setProjection(const glm::mat4& proj) { m_model.setProjection(proj); }
-    void    setView(const glm::mat4& view) { m_model.setView(view); }
     const   glm::vec3& getPosition() const { return m_position; }
     const   glm::vec3& getForwardDirection() const { return m_forward; }
     const   glm::vec3& getUpDirection() const { return m_up; }

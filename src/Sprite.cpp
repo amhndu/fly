@@ -47,8 +47,14 @@ Sprite::Sprite()
 
     glGenBuffers(1, &m_vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-    assert(m_shader.loadShaderString(vertex_shader,   Shader::Vertex));
-    assert(m_shader.loadShaderString(fragment_shader, Shader::Fragment));
+    if (m_shader.loadShaderString(vertex_shader,   Shader::Vertex))
+    {
+        LOG(Info) << "Loaded sprite vertex shader" << std::endl;
+    }
+    if (m_shader.loadShaderString(fragment_shader, Shader::Fragment))
+    {
+        LOG(Info) << "Loaded sprite fragment shader" << std::endl;
+    }
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     m_shader.use();
     m_shader.setAttributeFloat("position", 2, 4 * sizeof(float), 0);

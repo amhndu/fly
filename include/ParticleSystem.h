@@ -14,12 +14,11 @@ class ParticleSystem
 {
 
 public:
-    ParticleSystem(int max_particles) : m_data(max_particles), m_renderer(m_data) {}
+    ParticleSystem(int max_particles = 0) : m_data(max_particles), m_renderer(m_data) {}
     ParticleRenderer& getRenderer() { return m_renderer; }
     void setParticleSize(float size);
     void setMaxAge(float age);
     void update(float deltaTime);
-//     void draw() { m_renderer.draw(); }
     void reset(int max_particles);
     void addUpdater(ParticleUpdater updater) { m_updaters.push_back(updater); }
     void addEmitter(ParticleEmitter emitter) { m_emitters.push_back(emitter); }

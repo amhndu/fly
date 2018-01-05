@@ -18,9 +18,11 @@ public:
     ShadowMap(Airplane& plane);
     // Updates the shadow map and returns the light space transformation matrix
     const glm::mat4 update();
+    void setLightDirection(const glm::vec3& dir) { m_lightDirection = dir; }
 private:
     Airplane&     m_airplane;
     glm::mat4     m_projection;
+    glm::vec3     m_lightDirection;
     FrameBuffer   m_frameBuffer;
 //     GLuint        m_frameBuffer;
 //     GLuint        m_depthMap;

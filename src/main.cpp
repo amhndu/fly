@@ -1,6 +1,5 @@
 #include <chrono>
 #include <SFML/Window.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <GL/glew.h>
 #include "Terrain.h"
 #include "Log.h"
@@ -53,9 +52,6 @@ void printHelp()
 Options processArguments(int argc, char** argv)
 {
     using namespace fly;
-
-    OBB obb({2,2,2}, glm::mat4{});
-
 
     std::vector<std::string> arguments;
     Options opts = DefaultOptions;
@@ -147,8 +143,6 @@ int main(int argc, char** argv)
     std::srand(std::time(nullptr));
 
     Options opts = processArguments(argc, argv);
-    // FIXME
-//    opts.planeBox = true;
     if (opts.showHelp)
     {
         printHelp();
@@ -198,19 +192,28 @@ int main(int argc, char** argv)
     glm::mat4 projection_matrix = glm::perspective(glm::radians(45.0f),
                                                    1.f * window.getSize().x / window.getSize().y,
                                                    0.05f, 50.0f);
+
     Terrain terrain(15, 15);
-
     Airplane aircraft;
-    aircraft.setProjection(projection_matrix);
-
     ShadowMap shadowMap(aircraft);
+    Sky sky;
+    ParticleSystem particles;
+
+    auto& terrainRenderer  = terrain.getRenderer();
+    auto& aircraftRenderer = aircraft.getRenderer();
 
     terrain.generate(opts.manualSeed ? opts.seed :
                      std::rand() % 1000 + 1.f * std::rand() / RAND_MAX);
-    terrain.setProjection(projection_matrix);
 
-    Sky sky;
-    sky.setProjection(projection_matrix);
+
+    particles.getRenderer().setProjection(projection_matrix);
+    aircraftRenderer.       setProjection(projection_matrix);
+    terrainRenderer.        setProjection(projection_matrix);
+    sky.                    setProjection(projection_matrix);
+
+    aircraftRenderer.setLightDirection({-0.3f, 0.3f, 0.9f});
+    terrainRenderer.setLightDirection({-0.3, 0.3, 0.9});
+    shadowMap.setLightDirection({-0.3f, 0.3f, 0.9f});
 
 
     Camera camera(aircraft.getPosition(),                // Start position
@@ -251,8 +254,6 @@ int main(int argc, char** argv)
                                 .attachDepthTexture()
                                 .build();
 
-    ParticleSystem particles(3000);
-    particles.getRenderer().setProjection(projection_matrix);
     particles.getRenderer().useFrameBuffer(FrameBuffer::Builder(window.getSize().x, window.getSize().y)
                                             .attachColor0("particlesFrameBuffer")
                                             .attachDepthTexture(main_frame_buffer.getDepthBuffer())
@@ -264,9 +265,10 @@ int main(int argc, char** argv)
     glGetIntegerv(GL_VIEWPORT, viewport_save);
 
     auto prev_time = std::chrono::steady_clock::now();
-    const std::chrono::steady_clock::duration frame_period(std::chrono::milliseconds(1000/60));
+    const std::chrono::steady_clock::duration frame_period(std::chrono::milliseconds(1000 / 60));
     const float frame_period_seconds = std::chrono::duration<float>(frame_period).count();
     sf::Event event;
+
     // Perhaps use a state system here...
     bool running = true;
     bool focus   = true;
@@ -289,19 +291,6 @@ int main(int argc, char** argv)
             else if (focus && event.type == sf::Event::KeyReleased
                     && event.key.code == sf::Keyboard::F4)
                 paused = !paused;
-//            else if (focus && event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::E)
-//            {
-//                particles.reset(3000);
-//                particles.addEmitter(Emitter::createUniformCone(300, aircraft.getPosition(), glm::vec3{0.001f},
-//                    aircraft.getUpDirection() * 0.005f, 3.f, 8.f, 0.02f, 0.05f, M_PI_2, 400));
-//                particles.addEmitter(Emitter::createExplosion(aircraft.getPosition(), aircraft.getUpDirection(),
-//                                                       {0.f, 0.f, -0.05f}, 0.01f);
-//                particles.addUpdater(Updater::basicPhysics);
-//                particles.addUpdater(Updater::lifeUpdater);
-//                particles.addUpdater(Updater::fireColor);
-//                particles.addUpdater(Updater::createLinearSize(0.001f, 0.020f));
-//                particles.getRenderer().setBlending(Additive);
-//            }
             else if (focus)
                 mouse_camera.passEvent(event);
 
@@ -328,16 +317,16 @@ int main(int argc, char** argv)
             if (camera.viewChanged())
             {
                 glm::mat4 view = camera.getView();
-                terrain.setView(view);
-                aircraft.setView(view);
-                sky.setView(view);
                 particles.getRenderer().setView(view);
+                aircraftRenderer.setView(view);
+                terrainRenderer.setView(view);
+                sky.setView(view);
                 if (opts.planeBox)
                     box->setView(view);
             }
 
             auto&& light_space = shadowMap.update();
-            terrain.setLightSpace(light_space);
+            terrainRenderer.setLightSpace(light_space);
             glViewport(viewport_save[0], viewport_save[1], viewport_save[2], viewport_save[3]);
 
             auto boundingBox = glm::translate(aircraft.getModel(),
@@ -348,13 +337,12 @@ int main(int argc, char** argv)
                 crashed = true;
                 particles.reset(5000);
                 particles.addEmitter(Emitter::createUniformCone(650 * 1.5f, aircraft.getPosition(),
-                            glm::vec3{0.001f}, aircraft.getUpDirection() * 0.023f,
+                            glm::vec3{0.001f, 0.001f, 0.0020f}, {0.f, 0.f, 0.023f},
                             4.f, 5.f, 1.00f, 3.00f, PI / 4.f, 600));
                 particles.addEmitter(Emitter::createExplosion(aircraft.getPosition(),
                                                               {0.f, 0.f, 1.f},
-//                                                              aircraft.getUpDirection(),
                                                               {0.f, 0.f, -0.05f * 1.5f * 1.5f},
-                                                              0.10f * 1.5f));
+                                                              0.08f * 1.5f));
                 particles.addUpdater(Updater::basicPhysics);
                 particles.addUpdater(Updater::lifeUpdater);
                 particles.addUpdater(Updater::fireColor);
@@ -366,8 +354,8 @@ int main(int argc, char** argv)
             glClear(GL_DEPTH_BUFFER_BIT);
              if (opts.wireframe)
                 glClear(GL_COLOR_BUFFER_BIT);
-            aircraft.draw();
-            terrain.draw();
+            aircraftRenderer.draw();
+            terrainRenderer.draw();
             if (opts.planeBox)
             {
                 box->setTransform(glm::scale(boundingBox, aircraft.getLocalBounds().dimensions));
