@@ -2,17 +2,18 @@ Fly
 =====
 
 ![fly-screenshot](screenshot.png)
+![collision gif](https://thumbs.gfycat.com/CharmingFastCoqui-size_restricted.gif)
 
 A simple flight simulator in C++11/OpenGL.
 
 Features a procedurally generated infinite terrain over which you can fly around.
-With custom-built particles sytstem for explosion.
+With *explosions*!
+
 
 External dependencies:
 
 * SFML
 * GLEW
-
 
 Should be available in your repos. Once, installed, run cmake on the project directory.
 
@@ -34,6 +35,7 @@ usage: Fly [options...]
 -s Z | sZ            Set seed to Z (default: random seed)
 -f   | --fullscreen  Set fullscreen mode (default: false)
 --wireframe          Render in wireframe mode (default: false)
+--plane-box          Draw a bounding box around the plane (default: false)
 ```
 
 YouTube Playlist:

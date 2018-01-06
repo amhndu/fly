@@ -1,6 +1,7 @@
 #include <chrono>
 #include <SFML/Window.hpp>
 #include <GL/glew.h>
+#include <glm/gtx/transform.hpp>
 #include "Terrain.h"
 #include "Log.h"
 #include "TextureManager.h"
@@ -335,7 +336,7 @@ int main(int argc, char** argv)
             {
                 aircraft.crash();
                 crashed = true;
-                particles.reset(5000);
+                particles.reset(4601);
                 particles.addEmitter(Emitter::createUniformCone(650 * 1.5f, aircraft.getPosition(),
                             glm::vec3{0.001f, 0.001f, 0.0020f}, {0.f, 0.f, 0.023f},
                             4.f, 5.f, 1.00f, 3.00f, PI / 4.f, 600));
