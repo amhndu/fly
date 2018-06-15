@@ -3,6 +3,7 @@
 #include "Utility.h"
 #include <GL/glew.h>
 #include <SFML/Graphics/Image.hpp>
+#include <cstdint>
 
 namespace fly
 {

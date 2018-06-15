@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <GL/glew.h>
 #include <glm/gtx/transform.hpp>
+#include <cstdint>
 #include "Terrain.h"
 #include "Log.h"
 #include "TextureManager.h"

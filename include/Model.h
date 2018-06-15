@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
+#include <cstdint>
 #include "Shader.h"
 #include "VertexArrayObject.h"
 #include "Renderer.h"

@@ -144,8 +144,8 @@ void TerrainRenderer::updateChunk(int chunk_x, int chunk_y,
         }
     }
 
-    assert(elements.size() == (uint)m_elementsPerChunk);
-    assert(vertices.size() == (uint)m_verticesPerChunk);
+    assert(elements.size() == (unsigned int)m_elementsPerChunk);
+    assert(vertices.size() == (unsigned int)m_verticesPerChunk);
 
     m_vao.bind();
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);      // VAO doesn't store VBO binding

@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <GL/glew.h>
+#include <cstdint>
 
 namespace fly
 {

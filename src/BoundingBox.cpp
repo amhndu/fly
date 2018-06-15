@@ -12,7 +12,7 @@ namespace fly
 OBB::OBB(const glm::vec3& dimensions, const glm::mat4& transformation)
 {
     glm::vec4 half_extent {dimensions / 2.0f, 1.f};
-    for (uint i = 0; i < 8; ++i)
+    for (auto i = 0u; i < 8; ++i)
     {
         glm::vec4 local_point {((i & 4) >> 1) - 1.f,
                                (i & 2) - 1.f,

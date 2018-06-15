@@ -2,6 +2,7 @@
 #include <OBJ_Loader.h>
 #include <unordered_map>
 #include <algorithm>
+#include <cstdint>
 #include "Model.h"
 #include "Log.h"
 #include "Utility.h"
