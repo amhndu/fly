@@ -4,6 +4,7 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
+#include <algorithm>
 
 namespace fly
 {
@@ -53,7 +54,10 @@ void Airplane::update(float dt)
         positive_velocity = sign(m_up.z) * -sign(m_left.z) > 0;
         rate = 0.014f;
     }
-    auto clamping_func = positive_velocity ? std::min<float> : std::max<float>;
+
+    using ClampFunction = const float& (*)(const float&, const float&);
+
+    auto clamping_func = positive_velocity ? ClampFunction(std::min) : ClampFunction(std::max);
     m_rollVelocity = clamping_func(m_rollVelocity + target_velocity * rate, target_velocity);
     float dAngleX = m_rollVelocity * dt;
     if (std::abs(dAngleX) > 1e-5)
@@ -72,7 +76,7 @@ void Airplane::update(float dt)
         positive_velocity = sign(m_up.z) * sign(m_forward.z) > 0;
         rate = 0.03f;
     }
-    clamping_func = positive_velocity ? std::min<float> : std::max<float>;
+    clamping_func = positive_velocity ? ClampFunction(std::min) : ClampFunction(std::max);
     m_pitchVelocity = clamping_func(m_pitchVelocity + target_velocity * rate, target_velocity);
     float dAngleY = m_pitchVelocity * dt;
     if (std::abs(dAngleY) > 1e-5)

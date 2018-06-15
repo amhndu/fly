@@ -15,7 +15,7 @@ public:
     FrameBuffer(const FrameBuffer& other) = delete;
     ~FrameBuffer();
 
-    FrameBuffer operator=(FrameBuffer&& other);
+    FrameBuffer& operator=(FrameBuffer&& other);
 
     void bind() {  glBindFramebuffer(GL_FRAMEBUFFER, m_handle); }
     static void bindDefault() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }

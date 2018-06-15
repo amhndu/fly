@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.11)
 project(Fly)
 
 if(NOT CMAKE_BUILD_TYPE)

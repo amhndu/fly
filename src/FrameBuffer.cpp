@@ -107,7 +107,7 @@ FrameBuffer::FrameBuffer(FrameBuffer &&other)
     m_depthBuffer = std::exchange(other.m_depthBuffer, 0);
 }
 
-FrameBuffer FrameBuffer::operator=(fly::FrameBuffer && other)
+FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other)
 {
     if (m_handle)
     {
@@ -119,6 +119,7 @@ FrameBuffer FrameBuffer::operator=(fly::FrameBuffer && other)
     m_handle      = std::exchange(other.m_handle, 0);
     m_colorBuffer = std::exchange(other.m_colorBuffer, 0);
     m_depthBuffer = std::exchange(other.m_depthBuffer, 0);
+    return *this;
 }
 
 
