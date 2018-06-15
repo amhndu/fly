@@ -10,14 +10,6 @@ Features a procedurally generated infinite terrain over which you can fly around
 With *explosions*!
 
 
-External dependencies:
-
-* SFML
-* GLEW
-
-Should be available in your repos. Once, installed, run cmake on the project directory.
-
-
 Controls:
 -----------
 WASD or Arrow keys to change the plane's direction.
@@ -41,6 +33,27 @@ usage: Fly [options...]
 YouTube Playlist:
 ------------------
 [Link to YouTube Playlist](https://www.youtube.com/playlist?list=PLiULt7qySWt20wzP_o6aeUNaClIziR0TR)
+
+
+Compiling
+-----------
+
+You need:
+* SFML 2.1+ development headers and library
+* C++11 compliant compiler
+* CMake 3.11+
+* GLEW
+
+Once you have the dependencies, run cmake on the source directory, if the dependencies aren't in a standard path, you may have to specify their paths.
+e.g., on Linux/OS X/FreeBSD:
+```
+$ git clone https://github.com/amhndu/Fly
+$ cd Fly
+$ mkdir build/ && cd build/
+$ cmake ..
+$ make -j4
+```
+On Windows, you might find `cmake-gui` useful, set the build and source directories, run configure. If dependencies weren't found, add their paths in the gui, then generate makefiles/Visual Studion solution to compile.
 
 
 Contact:
