@@ -116,7 +116,7 @@ void Airplane::update(float dt)
     m_velocity += acceleration * dt;
 
     m_position += m_velocity * dt;
-    m_translationMatrix = glm::translate({}, m_position);
+    m_translationMatrix = glm::translate(glm::mat4{1.f}, m_position);
 
     auto transform = m_translationMatrix * m_rotationMatrix;
     m_model.setTransform(transform);
