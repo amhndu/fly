@@ -1,7 +1,7 @@
 language: cpp
 dist: bionic
 
-install: sudo apt-get install -y libsfml-dev libglew-dev
+install: sudo apt-get install -y libsfml-dev libglew-dev libudev-dev libxcb-image0-dev
 
 compiler:
     - gcc
