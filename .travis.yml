@@ -1,0 +1,10 @@
+language: cpp
+dist: bionic
+install: sudo apt-get install -y libsfml-dev libglew-dev
+compiler:
+    - gcc
+    - clang
+before_script: mkdir build/ && cd build/
+script:
+    - cmake ..
+    - make
