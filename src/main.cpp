@@ -1,3 +1,4 @@
+#include <memory>
 #include <chrono>
 #include <SFML/Window.hpp>
 #include <GL/glew.h>
