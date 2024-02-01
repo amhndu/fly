@@ -16,21 +16,20 @@ void Controller::takeInput(float dt)
 {
     // some shorthands..
     using Key       = sf::Keyboard;
-    auto  isPressed = sf::Keyboard::isKeyPressed;
 
-    if (isPressed(Key::W) || isPressed(Key::Up))
+    if (sf::Keyboard::isKeyPressed(Key::W) || sf::Keyboard::isKeyPressed(Key::Up))
         m_callbacks[ElevatorDown]();
-    if (isPressed(Key::S) || isPressed(Key::Down))
+    if (sf::Keyboard::isKeyPressed(Key::S) || sf::Keyboard::isKeyPressed(Key::Down))
         m_callbacks[ElevatorUp]();
 
-    if (isPressed(Key::A) || isPressed(Key::Left))
+    if (sf::Keyboard::isKeyPressed(Key::A) || sf::Keyboard::isKeyPressed(Key::Left))
         m_callbacks[RollLeft]();
-    if (isPressed(Key::D) || isPressed(Key::Right))
+    if (sf::Keyboard::isKeyPressed(Key::D) || sf::Keyboard::isKeyPressed(Key::Right))
         m_callbacks[RollRight]();
 
-    if (isPressed(Key::Space))
+    if (sf::Keyboard::isKeyPressed(Key::Space))
         m_callbacks[ThrustUp]();
-    if (isPressed(Key::LShift))
+    if (sf::Keyboard::isKeyPressed(Key::LShift))
         m_callbacks[ThrustDown]();
 
 }

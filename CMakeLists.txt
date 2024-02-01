@@ -77,7 +77,7 @@ include_directories(${SFML_INCLUDE_DIR} ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DI
 add_executable(Fly ${SOURCES})
 target_link_libraries(Fly ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
 
-set_property(TARGET Fly PROPERTY CXX_STANDARD 14)
+set_property(TARGET Fly PROPERTY CXX_STANDARD 17)
 set_property(TARGET Fly PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(Fly)
